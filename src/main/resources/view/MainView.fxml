@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.canvas.Canvas?>
+<BorderPane xmlns="http://javafx.com/javafx/11.0.2"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="lewocz.graphics.view.MainView"
+            prefWidth="600" prefHeight="400">
+
+    <fx:define>
+        <ToggleGroup fx:id="toolToggleGroup"/>
+    </fx:define>
+
+    <top>
+        <ToolBar>
+            <ToggleButton text="Select" fx:id="selectToolButton" toggleGroup="$toolToggleGroup" selected="true"/>
+            <ToggleButton text="Triangle" fx:id="triangleToolButton" toggleGroup="$toolToggleGroup"/>
+            <ToggleButton text="Quadrilateral" fx:id="quadrilateralToolButton" toggleGroup="$toolToggleGroup"/>
+            <ToggleButton text="Ellipse" fx:id="ellipseToolButton" toggleGroup="$toolToggleGroup"/>
+            <ToggleButton fx:id="lineToolButton" text="Line" toggleGroup="$toolToggleGroup" />
+            <ToggleButton fx:id="freehandToolButton" text="Freehand" toggleGroup="$toolToggleGroup" />
+        </ToolBar>
+    </top>
+
+    <center>
+        <StackPane fx:id="canvasPane">
+            <Canvas fx:id="canvas"/>
+        </StackPane>
+    </center>
+</BorderPane>
