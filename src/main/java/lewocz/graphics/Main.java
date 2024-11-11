@@ -1,15 +1,19 @@
 package lewocz.graphics;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class Main extends Application {
+
+	private ConfigurableApplicationContext context;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -17,7 +21,7 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		var context = SpringApplication.run(Main.class);
+		context = SpringApplication.run(Main.class);
 
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/MainView.fxml"));
 
@@ -30,5 +34,11 @@ public class Main extends Application {
 		stage.setTitle("Grafika komputerowa");
 		stage.setMaximized(true);
 		stage.show();
+	}
+
+	@Override
+	public void stop() {
+		context.close();
+		Platform.exit();
 	}
 }
