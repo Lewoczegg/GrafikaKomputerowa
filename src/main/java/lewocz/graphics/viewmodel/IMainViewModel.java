@@ -3,13 +3,11 @@ package lewocz.graphics.viewmodel;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import lewocz.graphics.model.ShapeModel;
 
-import javax.swing.*;
 
 public interface IMainViewModel {
     // Observable List of Shapes
@@ -45,4 +43,6 @@ public interface IMainViewModel {
     void onMouseReleased();
 
     Group createRGBColoredCube(float size);
+
+    void setRedrawCanvasCallback(Runnable callback);
 }

@@ -1,5 +1,6 @@
 package lewocz.graphics.viewmodel;
 
+import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,6 +43,8 @@ public class MainViewModel implements IMainViewModel {
     private final DoubleProperty strokeWidth = new SimpleDoubleProperty(1.0);
 
     private boolean isUpdating = false;
+
+    private final ObjectProperty<Runnable> redrawCanvasCallback = new SimpleObjectProperty<>();
 
     private double startX, startY;
     private boolean isDragging;
@@ -100,6 +103,8 @@ public class MainViewModel implements IMainViewModel {
             default:
                 break;
         }
+
+        requestRedraw();
     }
 
     @Override
@@ -134,6 +139,8 @@ public class MainViewModel implements IMainViewModel {
             default:
                 break;
         }
+
+        requestRedraw();
     }
 
     @Override
@@ -166,6 +173,13 @@ public class MainViewModel implements IMainViewModel {
             default:
                 break;
         }
+
+        requestRedraw();
+    }
+
+    @Override
+    public void setRedrawCanvasCallback(Runnable callback) {
+        redrawCanvasCallback.set(callback);
     }
 
     private void addShape(ShapeModel shape) {
@@ -470,5 +484,11 @@ public class MainViewModel implements IMainViewModel {
         PhongMaterial material = new PhongMaterial(color);
         cube.setMaterial(material);
         return cube;
+    }
+
+    private void requestRedraw() {
+        if (redrawCanvasCallback.get() != null) {
+            Platform.runLater(redrawCanvasCallback.get());
+        }
     }
 }

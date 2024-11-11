@@ -12,6 +12,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.util.converter.NumberStringConverter;
+import lewocz.graphics.command.*;
+import lewocz.graphics.event.EventQueue;
 import lewocz.graphics.model.ShapeModel;
 import lewocz.graphics.viewmodel.IMainViewModel;
 import org.slf4j.Logger;
@@ -107,6 +109,7 @@ public class MainView {
     private double rotateY = 0;
 
     private final IMainViewModel mainViewModel;
+    private final EventQueue eventQueue = new EventQueue();
 
     private GraphicsContext gc;
 
@@ -121,6 +124,7 @@ public class MainView {
         setupCanvasListeners();
         bindColorProperties();
         setUp3DScene();
+        mainViewModel.setRedrawCanvasCallback(this::redrawCanvas);
         redrawCanvas();
     }
 
@@ -177,7 +181,8 @@ public class MainView {
         toolToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle != null) {
                 ToggleButton selectedButton = (ToggleButton) newToggle;
-                mainViewModel.setToolSelected(selectedButton.getText());
+                Command command = new SetToolCommand(mainViewModel, selectedButton.getText());
+                eventQueue.enqueue(command);
             }
         });
 
@@ -246,16 +251,16 @@ public class MainView {
 
     private void setupCanvasListeners() {
         canvas.setOnMousePressed(mouseEvent -> {
-            mainViewModel.onMousePressed(mouseEvent.getX(), mouseEvent.getY());
-            redrawCanvas();
+            Command command = new MousePressedCommand(mainViewModel, mouseEvent.getX(), mouseEvent.getY());
+            eventQueue.enqueue(command);
         });
         canvas.setOnMouseDragged(mouseEvent -> {
-            mainViewModel.onMouseDragged(mouseEvent.getX(), mouseEvent.getY());
-            redrawCanvas();
+            Command command = new MouseDraggedCommand(mainViewModel, mouseEvent.getX(), mouseEvent.getY());
+            eventQueue.enqueue(command);
         });
         canvas.setOnMouseReleased(mouseEvent -> {
-            mainViewModel.onMouseReleased();
-            redrawCanvas();
+            Command command = new MouseReleasedCommand(mainViewModel);
+            eventQueue.enqueue(command);
         });
 
         canvas.widthProperty().addListener(evt -> redrawCanvas());
