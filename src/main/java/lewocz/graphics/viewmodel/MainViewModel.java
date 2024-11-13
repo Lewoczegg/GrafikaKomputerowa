@@ -715,107 +715,77 @@ public class MainViewModel implements IMainViewModel {
         }
     }
 
-    private void loadFromTextPNM(BufferedReader br, int width, int height, int maxColorValue, PixelWriter pixelWriter, String formatType) throws IOException {
-        int totalPixels = width * height;
-        List<String> tokens = new ArrayList<>();
+    private void loadFromTextPNM(BufferedReader br, int width, int height, int maxColorValue,
+                                 PixelWriter pixelWriter, String formatType) throws IOException {
+        StreamTokenizer tokenizer = new StreamTokenizer(br);
+        tokenizer.resetSyntax();
+        tokenizer.whitespaceChars(0, ' ');
+        tokenizer.wordChars('0', '9');
+        tokenizer.wordChars('-', '-'); // Allow negative numbers if necessary
+        tokenizer.eolIsSignificant(false);
+        tokenizer.commentChar('#');
 
-        // Read all tokens
-        String line;
-        while ((line = br.readLine()) != null) {
-            // Remove inline comments
-            int commentIndex = line.indexOf('#');
-            if (commentIndex != -1) {
-                line = line.substring(0, commentIndex);
-            }
-            line = line.trim();
+        int x = 0;
+        int y = 0;
 
-            // Skip empty lines
-            if (line.isEmpty()) {
-                continue;
-            }
+        while (y < height) {
+            if (formatType.equals("PPM")) {
+                int red = nextIntToken(tokenizer, maxColorValue, "red");
+                int green = nextIntToken(tokenizer, maxColorValue, "green");
+                int blue = nextIntToken(tokenizer, maxColorValue, "blue");
 
-            // Split the line into tokens
-            String[] lineTokens = line.split("\\s+");
-            for (String token : lineTokens) {
-                if (!token.isEmpty()) {
-                    tokens.add(token);
+                processColorValue(red, green, blue, maxColorValue, pixelWriter, x, y);
+
+                x++;
+                if (x >= width) {
+                    x = 0;
+                    y++;
                 }
-            }
-        }
+            } else if (formatType.equals("PGM")) {
+                int grayValue = nextIntToken(tokenizer, maxColorValue, "gray");
+                double brightness = grayValue / (double) maxColorValue;
+                Color color = Color.gray(brightness);
+                pixelWriter.setColor(x, y, color);
 
-        int expectedTokens = 0;
-        if (formatType.equals("PPM")) {
-            expectedTokens = totalPixels * 3;
-        } else if (formatType.equals("PGM")) {
-            expectedTokens = totalPixels;
-        } else if (formatType.equals("PBM")) {
-            expectedTokens = totalPixels;
-        }
-
-        if (tokens.size() < expectedTokens) {
-            throw new IOException("Not enough pixel data in " + formatType + " file. Expected " + expectedTokens + " tokens, but found " + tokens.size() + ".");
-        } else if (tokens.size() > expectedTokens) {
-            throw new IOException("Too much pixel data in " + formatType + " file. Expected " + expectedTokens + " tokens, but found " + tokens.size() + ".");
-        }
-
-        int tokenIndex = 0;
-
-        if (formatType.equals("PPM")) {
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    if (tokenIndex + 2 >= tokens.size()) {
-                        throw new IOException("Not enough pixel data when processing pixel at (" + x + ", " + y + ").");
-                    }
-
-                    int red = parseIntWithValidation(tokens.get(tokenIndex++), maxColorValue, "red");
-                    int green = parseIntWithValidation(tokens.get(tokenIndex++), maxColorValue, "green");
-                    int blue = parseIntWithValidation(tokens.get(tokenIndex++), maxColorValue, "blue");
-
-                    processColorValue(red, green, blue, maxColorValue, pixelWriter, x, y);
+                x++;
+                if (x >= width) {
+                    x = 0;
+                    y++;
                 }
-            }
-        } else if (formatType.equals("PGM")) {
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    if (tokenIndex >= tokens.size()) {
-                        throw new IOException("Not enough pixel data when processing pixel at (" + x + ", " + y + ").");
-                    }
-
-                    int grayValue = parseIntWithValidation(tokens.get(tokenIndex++), maxColorValue, "gray");
-                    double brightness = grayValue / (double) maxColorValue;
-                    Color color = Color.gray(brightness);
-                    pixelWriter.setColor(x, y, color);
+            } else if (formatType.equals("PBM")) {
+                int pixelValue = nextIntToken(tokenizer, 1, "pixel");
+                if (pixelValue != 0 && pixelValue != 1) {
+                    throw new IOException("Invalid pixel value in PBM file: " + pixelValue);
                 }
-            }
-        } else if (formatType.equals("PBM")) {
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    if (tokenIndex >= tokens.size()) {
-                        throw new IOException("Not enough pixel data when processing pixel at (" + x + ", " + y + ").");
-                    }
+                Color color = (pixelValue == 1) ? Color.BLACK : Color.WHITE;
+                pixelWriter.setColor(x, y, color);
 
-                    int value = parseIntWithValidation(tokens.get(tokenIndex++), 1, "pixel");
-                    if (value != 0 && value != 1) {
-                        throw new IOException("Invalid pixel value in PBM file: " + value);
-                    }
-                    Color color = (value == 1) ? Color.BLACK : Color.WHITE;
-                    pixelWriter.setColor(x, y, color);
+                x++;
+                if (x >= width) {
+                    x = 0;
+                    y++;
                 }
             }
         }
     }
 
-    private int parseIntWithValidation(String valueStr, int maxValue, String componentName) throws IOException {
-        int value;
-        try {
-            value = Integer.parseInt(valueStr);
-        } catch (NumberFormatException e) {
-            throw new IOException("Invalid " + componentName + " value: " + valueStr, e);
+    private int nextIntToken(StreamTokenizer tokenizer, int maxValue, String componentName) throws IOException {
+        int tokenType;
+        while ((tokenType = tokenizer.nextToken()) != StreamTokenizer.TT_EOF) {
+            if (tokenType == StreamTokenizer.TT_NUMBER || tokenType == StreamTokenizer.TT_WORD) {
+                String tokenStr = tokenizer.sval != null ? tokenizer.sval : String.valueOf((int) tokenizer.nval);
+                try {
+                    int value = Integer.parseInt(tokenStr);
+                    if (value < 0 || value > maxValue) {
+                        throw new IOException(componentName + " value out of bounds: " + value);
+                    }
+                    return value;
+                } catch (NumberFormatException e) {
+                    throw new IOException("Invalid " + componentName + " value: " + tokenStr, e);
+                }
+            }
         }
-        if (value < 0 || value > maxValue) {
-            throw new IOException(componentName + " value out of bounds: " + value);
-        }
-        return value;
+        throw new IOException("Unexpected end of file while reading " + componentName + " value");
     }
 
     private void processColorValue(int red, int green, int blue, int maxColorValue, PixelWriter pixelWriter, int x, int y) throws IOException {
