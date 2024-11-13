@@ -379,11 +379,11 @@ public class MainView {
             String fileName = file.getName().toLowerCase();
             Command command;
             if (fileName.endsWith(".pbm")) {
-                command = new LoadCommand(mainViewModel, file.getAbsolutePath(), gc, "PBM");
+                command = new LoadCommand(mainViewModel, file.getAbsolutePath(), "PBM");
             } else if (fileName.endsWith(".pgm")) {
-                command = new LoadCommand(mainViewModel, file.getAbsolutePath(), gc, "PGM");
+                command = new LoadCommand(mainViewModel, file.getAbsolutePath(), "PGM");
             } else if (fileName.endsWith(".ppm")) {
-                command = new LoadCommand(mainViewModel, file.getAbsolutePath(), gc, "PPM");
+                command = new LoadCommand(mainViewModel, file.getAbsolutePath(), "PPM");
             } else {
                 // Unsupported file type
                 Alert alert = new Alert(Alert.AlertType.ERROR);

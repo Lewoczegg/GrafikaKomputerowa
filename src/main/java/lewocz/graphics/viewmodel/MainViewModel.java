@@ -5,7 +5,6 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -18,9 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 @Component
 public class MainViewModel implements IMainViewModel {
@@ -648,21 +644,21 @@ public class MainViewModel implements IMainViewModel {
     }
 
     @Override
-    public void loadFromPBM(String fileName, GraphicsContext gc) {
-        loadFromPNM(fileName, gc, "PBM");
+    public void loadFromPBM(String fileName) {
+        loadFromPNM(fileName, "PBM");
     }
 
     @Override
-    public void loadFromPGM(String fileName, GraphicsContext gc) {
-        loadFromPNM(fileName, gc, "PGM");
+    public void loadFromPGM(String fileName) {
+        loadFromPNM(fileName, "PGM");
     }
 
     @Override
-    public void loadFromPPM(String fileName, GraphicsContext gc) {
-        loadFromPNM(fileName, gc, "PPM");
+    public void loadFromPPM(String fileName) {
+        loadFromPNM(fileName, "PPM");
     }
 
-    private void loadFromPNM(String fileName, GraphicsContext gc, String formatType) {
+    private void loadFromPNM(String fileName, String formatType) {
         try (FileInputStream fis = new FileInputStream(fileName);
              PushbackInputStream pbis = new PushbackInputStream(fis, 1024)) {
 
@@ -704,10 +700,12 @@ public class MainViewModel implements IMainViewModel {
                 loadFromBinaryPNM(pbis, width, height, maxColorValue, pixelWriter, formatType);
             }
 
-            // Display the image on the canvas
+            ImageModel imageModel = new ImageModel(image, 0, 0);
+
             Platform.runLater(() -> {
-                gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
-                gc.drawImage(image, 0, 0);
+                shapes.clear();
+                shapes.add(imageModel);
+                requestRedraw();
             });
 
         } catch (IOException e) {

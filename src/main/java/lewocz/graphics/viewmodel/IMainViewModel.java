@@ -49,9 +49,9 @@ public interface IMainViewModel {
     void setRedrawCanvasCallback(Runnable callback);
 
     void saveToPBM(String fileName, boolean binaryFormat, WritableImage image);
-    void loadFromPBM(String fileName, GraphicsContext gc);
     void saveToPGM(String fileName, boolean binaryFormat, WritableImage image);
-    void loadFromPGM(String fileName, GraphicsContext gc);
     void saveToPPM(String fileName, boolean binaryFormat, WritableImage image);
-    void loadFromPPM(String fileName, GraphicsContext gc);
+    void loadFromPBM(String fileName);
+    void loadFromPGM(String fileName);
+    void loadFromPPM(String fileName);
 }
