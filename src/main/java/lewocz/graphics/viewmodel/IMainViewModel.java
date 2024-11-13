@@ -5,9 +5,9 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import lewocz.graphics.model.PNMFormat;
 import lewocz.graphics.model.ShapeModel;
 
 
@@ -48,10 +48,6 @@ public interface IMainViewModel {
 
     void setRedrawCanvasCallback(Runnable callback);
 
-    void saveToPBM(String fileName, boolean binaryFormat, WritableImage image);
-    void saveToPGM(String fileName, boolean binaryFormat, WritableImage image);
-    void saveToPPM(String fileName, boolean binaryFormat, WritableImage image);
-    void loadFromPBM(String fileName);
-    void loadFromPGM(String fileName);
-    void loadFromPPM(String fileName);
+    void saveImage(String fileName, PNMFormat format, boolean binaryFormat, WritableImage image);
+    void loadImage(String fileName, PNMFormat format);
 }

@@ -1,6 +1,7 @@
 package lewocz.graphics.command;
 
 import javafx.scene.image.WritableImage;
+import lewocz.graphics.model.PNMFormat;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class SaveCommand implements Command {
@@ -8,24 +9,18 @@ public class SaveCommand implements Command {
     private final String fileName;
     private final boolean binaryFormat;
     private final WritableImage image;
-    private final String formatType; // "PBM", "PGM", or "PPM"
+    private final PNMFormat format;
 
-    public SaveCommand(IMainViewModel viewModel, String fileName, boolean binaryFormat, WritableImage image, String formatType) {
+    public SaveCommand(IMainViewModel viewModel, String fileName, boolean binaryFormat, WritableImage image, PNMFormat format) {
         this.viewModel = viewModel;
         this.fileName = fileName;
         this.binaryFormat = binaryFormat;
         this.image = image;
-        this.formatType = formatType;
+        this.format = format;
     }
 
     @Override
     public void execute() {
-        if (formatType.equals("PBM")) {
-            viewModel.saveToPBM(fileName, binaryFormat, image);
-        } else if (formatType.equals("PGM")) {
-            viewModel.saveToPGM(fileName, binaryFormat, image);
-        } else if (formatType.equals("PPM")) {
-            viewModel.saveToPPM(fileName, binaryFormat, image);
-        }
+        viewModel.saveImage(fileName, format, binaryFormat, image);
     }
 }

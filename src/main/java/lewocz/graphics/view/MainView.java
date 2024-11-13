@@ -16,6 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.util.converter.NumberStringConverter;
 import lewocz.graphics.command.*;
 import lewocz.graphics.event.EventQueue;
+import lewocz.graphics.model.PNMFormat;
 import lewocz.graphics.model.ShapeModel;
 import lewocz.graphics.viewmodel.IMainViewModel;
 import org.slf4j.Logger;
@@ -295,11 +296,10 @@ public class MainView {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Image File");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("PBM/PGM/PPM Files", "*.pbm", "*.pgm", "*.ppm")
+                new FileChooser.ExtensionFilter("PNM Files", "*.pbm", "*.pgm", "*.ppm")
         );
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
-            // Ask user for format
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Select Image Format");
             alert.setHeaderText("Choose the format to save:");
@@ -309,59 +309,62 @@ public class MainView {
             ButtonType pgmBinaryButton = new ButtonType("PGM Binary (P5)");
             ButtonType ppmTextButton = new ButtonType("PPM Textual (P3)");
             ButtonType ppmBinaryButton = new ButtonType("PPM Binary (P6)");
-            alert.getButtonTypes().setAll(pbmTextButton, pbmBinaryButton, pgmTextButton, pgmBinaryButton, ppmTextButton, ppmBinaryButton, ButtonType.CANCEL);
+            alert.getButtonTypes().setAll(
+                    pbmTextButton, pbmBinaryButton,
+                    pgmTextButton, pgmBinaryButton,
+                    ppmTextButton, ppmBinaryButton,
+                    ButtonType.CANCEL
+            );
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() != ButtonType.CANCEL) {
-                // Capture the canvas content
                 WritableImage snapshot = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
                 canvas.snapshot(null, snapshot);
 
                 String filePath = file.getAbsolutePath();
-                String formatType = "";
+                PNMFormat format = null;
                 boolean binaryFormat = false;
 
                 if (result.get() == pbmTextButton) {
-                    formatType = "PBM";
+                    format = PNMFormat.PBM;
                     binaryFormat = false;
                     // Ensure file extension is .pbm
                     if (!filePath.toLowerCase().endsWith(".pbm")) {
                         filePath += ".pbm";
                     }
                 } else if (result.get() == pbmBinaryButton) {
-                    formatType = "PBM";
+                    format = PNMFormat.PBM;
                     binaryFormat = true;
                     if (!filePath.toLowerCase().endsWith(".pbm")) {
                         filePath += ".pbm";
                     }
                 } else if (result.get() == pgmTextButton) {
-                    formatType = "PGM";
+                    format = PNMFormat.PGM;
                     binaryFormat = false;
                     if (!filePath.toLowerCase().endsWith(".pgm")) {
                         filePath += ".pgm";
                     }
                 } else if (result.get() == pgmBinaryButton) {
-                    formatType = "PGM";
+                    format = PNMFormat.PGM;
                     binaryFormat = true;
                     if (!filePath.toLowerCase().endsWith(".pgm")) {
                         filePath += ".pgm";
                     }
                 } else if (result.get() == ppmTextButton) {
-                    formatType = "PPM";
+                    format = PNMFormat.PPM;
                     binaryFormat = false;
                     if (!filePath.toLowerCase().endsWith(".ppm")) {
                         filePath += ".ppm";
                     }
                 } else if (result.get() == ppmBinaryButton) {
-                    formatType = "PPM";
+                    format = PNMFormat.PPM;
                     binaryFormat = true;
                     if (!filePath.toLowerCase().endsWith(".ppm")) {
                         filePath += ".ppm";
                     }
                 }
 
-                // Create and enqueue the SaveCommand
-                Command command = new SaveCommand(mainViewModel, filePath, binaryFormat, snapshot, formatType);
+                Command command = new SaveCommand(mainViewModel, filePath, binaryFormat, snapshot, format);
                 eventQueue.enqueue(command);
             }
         }
@@ -371,27 +374,28 @@ public class MainView {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Image File");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("PBM/PGM/PPM Files", "*.pbm", "*.pgm", "*.ppm")
+                new FileChooser.ExtensionFilter("PNM Files", "*.pbm", "*.pgm", "*.ppm")
         );
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
-            // Determine file extension
             String fileName = file.getName().toLowerCase();
-            Command command;
+            PNMFormat format = null;
+
             if (fileName.endsWith(".pbm")) {
-                command = new LoadCommand(mainViewModel, file.getAbsolutePath(), "PBM");
+                format = PNMFormat.PBM;
             } else if (fileName.endsWith(".pgm")) {
-                command = new LoadCommand(mainViewModel, file.getAbsolutePath(), "PGM");
+                format = PNMFormat.PGM;
             } else if (fileName.endsWith(".ppm")) {
-                command = new LoadCommand(mainViewModel, file.getAbsolutePath(), "PPM");
+                format = PNMFormat.PPM;
             } else {
-                // Unsupported file type
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Unsupported File");
                 alert.setHeaderText("The selected file format is not supported.");
                 alert.showAndWait();
                 return;
             }
+
+            Command command = new LoadCommand(mainViewModel, file.getAbsolutePath(), format);
             eventQueue.enqueue(command);
         }
     }
