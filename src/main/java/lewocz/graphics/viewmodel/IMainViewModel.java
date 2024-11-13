@@ -5,6 +5,8 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import lewocz.graphics.model.ShapeModel;
 
@@ -45,4 +47,11 @@ public interface IMainViewModel {
     Group createRGBColoredCube(float size);
 
     void setRedrawCanvasCallback(Runnable callback);
+
+    void saveToPBM(String fileName, boolean binaryFormat, WritableImage image);
+    void loadFromPBM(String fileName, GraphicsContext gc);
+    void saveToPGM(String fileName, boolean binaryFormat, WritableImage image);
+    void loadFromPGM(String fileName, GraphicsContext gc);
+    void saveToPPM(String fileName, boolean binaryFormat, WritableImage image);
+    void loadFromPPM(String fileName, GraphicsContext gc);
 }

@@ -5,12 +5,22 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import lewocz.graphics.model.*;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 @Component
 public class MainViewModel implements IMainViewModel {
@@ -490,5 +500,484 @@ public class MainViewModel implements IMainViewModel {
         if (redrawCanvasCallback.get() != null) {
             Platform.runLater(redrawCanvasCallback.get());
         }
+    }
+
+    @Override
+    public void saveToPBM(String fileName, boolean binaryFormat, WritableImage image) {
+        saveToPNM(fileName, image, "PBM", binaryFormat);
+    }
+
+    @Override
+    public void saveToPGM(String fileName, boolean binaryFormat, WritableImage image) {
+        saveToPNM(fileName, image, "PGM", binaryFormat);
+    }
+
+    // New method for saving PPM files
+    @Override
+    public void saveToPPM(String fileName, boolean binaryFormat, WritableImage image) {
+        saveToPNM(fileName, image, "PPM", binaryFormat);
+    }
+
+    private void saveToPNM(String fileName, WritableImage image, String formatType, boolean binaryFormat) {
+        try {
+            if (binaryFormat) {
+                saveToBinaryPNM(fileName, image, formatType);
+            } else {
+                saveToTextPNM(fileName, image, formatType);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveToTextPNM(String fileName, WritableImage image, String formatType) throws IOException {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+        int maxColorValue = 255;
+        String magicNumber = switch (formatType) {
+            case "PGM" -> "P2";
+            case "PPM" -> "P3";
+            default -> "P1"; // PBM
+        };
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
+            // Write header
+            writePNMHeader(bw, magicNumber, width, height, maxColorValue);
+
+            PixelReader pixelReader = image.getPixelReader();
+            for (int y = 0; y < height; y++) {
+                StringBuilder line = new StringBuilder();
+                for (int x = 0; x < width; x++) {
+                    Color color = pixelReader.getColor(x, y);
+                    if (formatType.equals("PPM")) {
+                        int red = (int) (color.getRed() * maxColorValue);
+                        int green = (int) (color.getGreen() * maxColorValue);
+                        int blue = (int) (color.getBlue() * maxColorValue);
+                        line.append(red).append(" ").append(green).append(" ").append(blue).append(" ");
+                    } else if (formatType.equals("PGM")) {
+                        int grayValue = (int) (color.getBrightness() * maxColorValue);
+                        line.append(grayValue).append(" ");
+                    } else {
+                        int value = (color.getBrightness() < 0.5) ? 1 : 0;
+                        line.append(value).append(" ");
+                    }
+                }
+                bw.write(line.toString().trim() + "\n");
+            }
+        }
+    }
+
+    private void saveToBinaryPNM(String fileName, WritableImage image, String formatType) throws IOException {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+        int maxColorValue = 255;
+        String magicNumber = switch (formatType) {
+            case "PGM" -> "P5";
+            case "PPM" -> "P6";
+            default -> "P4"; // PBM
+        };
+
+        try (FileOutputStream fos = new FileOutputStream(fileName)) {
+            // Write header
+            writePNMHeader(fos, magicNumber, width, height, maxColorValue);
+
+            PixelReader pixelReader = image.getPixelReader();
+
+            if (formatType.equals("PPM")) {
+                // Save binary PPM data
+                byte[] pixelData = new byte[width * height * 3];
+                int index = 0;
+                for (int y = 0; y < height; y++) {
+                    for (int x = 0; x < width; x++) {
+                        Color color = pixelReader.getColor(x, y);
+                        pixelData[index++] = (byte) (color.getRed() * maxColorValue);
+                        pixelData[index++] = (byte) (color.getGreen() * maxColorValue);
+                        pixelData[index++] = (byte) (color.getBlue() * maxColorValue);
+                    }
+                }
+                fos.write(pixelData);
+            } else if (formatType.equals("PGM")) {
+                // Save binary PGM data
+                byte[] pixelData = new byte[width * height];
+                int index = 0;
+                for (int y = 0; y < height; y++) {
+                    for (int x = 0; x < width; x++) {
+                        Color color = pixelReader.getColor(x, y);
+                        int grayValue = (int) (color.getBrightness() * maxColorValue);
+                        pixelData[index++] = (byte) grayValue;
+                    }
+                }
+                fos.write(pixelData);
+            } else {
+                // Save binary PBM data
+                int bytesPerRow = (width + 7) / 8;
+                byte[] rowData = new byte[bytesPerRow];
+
+                for (int y = 0; y < height; y++) {
+                    for (int i = 0; i < bytesPerRow; i++) rowData[i] = 0;
+                    for (int x = 0; x < width; x++) {
+                        Color color = pixelReader.getColor(x, y);
+                        int bit = (color.getBrightness() < 0.5) ? 1 : 0;
+                        int bitPosition = 7 - (x % 8);
+                        if (bit == 1) {
+                            rowData[x / 8] |= (1 << bitPosition);
+                        }
+                    }
+                    fos.write(rowData);
+                }
+            }
+        }
+    }
+
+    private void writePNMHeader(BufferedWriter bw, String magicNumber, int width, int height, int maxColorValue) throws IOException {
+        bw.write(magicNumber + "\n");
+        bw.write(width + " " + height + "\n");
+        if (!magicNumber.equals("P1")) {
+            bw.write(maxColorValue + "\n");
+        }
+    }
+
+    private void writePNMHeader(OutputStream os, String magicNumber, int width, int height, int maxColorValue) throws IOException {
+        StringBuilder header = new StringBuilder();
+        header.append(magicNumber).append("\n");
+        header.append(width).append(" ").append(height).append("\n");
+        if (!magicNumber.equals("P4")) {
+            header.append(maxColorValue).append("\n");
+        }
+        os.write(header.toString().getBytes(StandardCharsets.US_ASCII));
+    }
+
+    @Override
+    public void loadFromPBM(String fileName, GraphicsContext gc) {
+        loadFromPNM(fileName, gc, "PBM");
+    }
+
+    @Override
+    public void loadFromPGM(String fileName, GraphicsContext gc) {
+        loadFromPNM(fileName, gc, "PGM");
+    }
+
+    @Override
+    public void loadFromPPM(String fileName, GraphicsContext gc) {
+        loadFromPNM(fileName, gc, "PPM");
+    }
+
+    private void loadFromPNM(String fileName, GraphicsContext gc, String formatType) {
+        try (FileInputStream fis = new FileInputStream(fileName);
+             PushbackInputStream pbis = new PushbackInputStream(fis, 1024)) {
+
+            // Read the magic number
+            String magicNumber = readNextToken(pbis);
+            boolean isBinary = magicNumber.equals("P4") || magicNumber.equals("P5") || magicNumber.equals("P6");
+
+            // Validate magic number
+            if (!magicNumber.matches("P[1-6]")) {
+                throw new IOException("Unsupported PNM format: " + magicNumber);
+            }
+
+            // Read the dimensions
+            int width = Integer.parseInt(readNextNonCommentToken(pbis));
+            int height = Integer.parseInt(readNextNonCommentToken(pbis));
+
+            int maxColorValue = 1; // Default for PBM
+            if (magicNumber.equals("P2") || magicNumber.equals("P3") || magicNumber.equals("P5") || magicNumber.equals("P6")) {
+                maxColorValue = Integer.parseInt(readNextNonCommentToken(pbis));
+            }
+
+            // Consume whitespace after header
+            int b;
+            do {
+                b = pbis.read();
+                if (b == -1) {
+                    throw new IOException("Unexpected end of file after header");
+                }
+            } while (Character.isWhitespace(b));
+            pbis.unread(b);
+
+            WritableImage image = new WritableImage(width, height);
+            PixelWriter pixelWriter = image.getPixelWriter();
+
+            if (!isBinary) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(pbis, StandardCharsets.US_ASCII));
+                loadFromTextPNM(br, width, height, maxColorValue, pixelWriter, formatType);
+            } else {
+                loadFromBinaryPNM(pbis, width, height, maxColorValue, pixelWriter, formatType);
+            }
+
+            // Display the image on the canvas
+            Platform.runLater(() -> {
+                gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+                gc.drawImage(image, 0, 0);
+            });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadFromTextPNM(BufferedReader br, int width, int height, int maxColorValue, PixelWriter pixelWriter, String formatType) throws IOException {
+        int totalPixels = width * height;
+        List<String> tokens = new ArrayList<>();
+
+        // Read all tokens
+        String line;
+        while ((line = br.readLine()) != null) {
+            // Remove inline comments
+            int commentIndex = line.indexOf('#');
+            if (commentIndex != -1) {
+                line = line.substring(0, commentIndex);
+            }
+            line = line.trim();
+
+            // Skip empty lines
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            // Split the line into tokens
+            String[] lineTokens = line.split("\\s+");
+            for (String token : lineTokens) {
+                if (!token.isEmpty()) {
+                    tokens.add(token);
+                }
+            }
+        }
+
+        int expectedTokens = 0;
+        if (formatType.equals("PPM")) {
+            expectedTokens = totalPixels * 3;
+        } else if (formatType.equals("PGM")) {
+            expectedTokens = totalPixels;
+        } else if (formatType.equals("PBM")) {
+            expectedTokens = totalPixels;
+        }
+
+        if (tokens.size() < expectedTokens) {
+            throw new IOException("Not enough pixel data in " + formatType + " file. Expected " + expectedTokens + " tokens, but found " + tokens.size() + ".");
+        } else if (tokens.size() > expectedTokens) {
+            throw new IOException("Too much pixel data in " + formatType + " file. Expected " + expectedTokens + " tokens, but found " + tokens.size() + ".");
+        }
+
+        int tokenIndex = 0;
+
+        if (formatType.equals("PPM")) {
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    if (tokenIndex + 2 >= tokens.size()) {
+                        throw new IOException("Not enough pixel data when processing pixel at (" + x + ", " + y + ").");
+                    }
+
+                    int red = parseIntWithValidation(tokens.get(tokenIndex++), maxColorValue, "red");
+                    int green = parseIntWithValidation(tokens.get(tokenIndex++), maxColorValue, "green");
+                    int blue = parseIntWithValidation(tokens.get(tokenIndex++), maxColorValue, "blue");
+
+                    processColorValue(red, green, blue, maxColorValue, pixelWriter, x, y);
+                }
+            }
+        } else if (formatType.equals("PGM")) {
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    if (tokenIndex >= tokens.size()) {
+                        throw new IOException("Not enough pixel data when processing pixel at (" + x + ", " + y + ").");
+                    }
+
+                    int grayValue = parseIntWithValidation(tokens.get(tokenIndex++), maxColorValue, "gray");
+                    double brightness = grayValue / (double) maxColorValue;
+                    Color color = Color.gray(brightness);
+                    pixelWriter.setColor(x, y, color);
+                }
+            }
+        } else if (formatType.equals("PBM")) {
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    if (tokenIndex >= tokens.size()) {
+                        throw new IOException("Not enough pixel data when processing pixel at (" + x + ", " + y + ").");
+                    }
+
+                    int value = parseIntWithValidation(tokens.get(tokenIndex++), 1, "pixel");
+                    if (value != 0 && value != 1) {
+                        throw new IOException("Invalid pixel value in PBM file: " + value);
+                    }
+                    Color color = (value == 1) ? Color.BLACK : Color.WHITE;
+                    pixelWriter.setColor(x, y, color);
+                }
+            }
+        }
+    }
+
+    private int parseIntWithValidation(String valueStr, int maxValue, String componentName) throws IOException {
+        int value;
+        try {
+            value = Integer.parseInt(valueStr);
+        } catch (NumberFormatException e) {
+            throw new IOException("Invalid " + componentName + " value: " + valueStr, e);
+        }
+        if (value < 0 || value > maxValue) {
+            throw new IOException(componentName + " value out of bounds: " + value);
+        }
+        return value;
+    }
+
+    private void processColorValue(int red, int green, int blue, int maxColorValue, PixelWriter pixelWriter, int x, int y) throws IOException {
+        if (red < 0 || red > maxColorValue || green < 0 || green > maxColorValue || blue < 0 || blue > maxColorValue) {
+            throw new IOException("Color value out of bounds at pixel (" + x + ", " + y + "): (" + red + ", " + green + ", " + blue + ")");
+        }
+        double r = red / (double) maxColorValue;
+        double g = green / (double) maxColorValue;
+        double b = blue / (double) maxColorValue;
+        Color color = new Color(r, g, b, 1.0);
+        pixelWriter.setColor(x, y, color);
+    }
+
+    private void loadFromBinaryPNM(InputStream is, int width, int height, int maxColorValue, PixelWriter pixelWriter, String formatType) throws IOException {
+        if (formatType.equals("PPM")) {
+            int bytesPerSample = (maxColorValue < 256) ? 1 : 2;
+            int totalSamples = width * height * 3;
+            int totalBytes = totalSamples * bytesPerSample;
+            byte[] pixelData = new byte[totalBytes];
+            int bytesRead = 0;
+
+            while (bytesRead < totalBytes) {
+                int result = is.read(pixelData, bytesRead, totalBytes - bytesRead);
+                if (result == -1) {
+                    throw new IOException("Unexpected end of file when reading pixel data");
+                }
+                bytesRead += result;
+            }
+
+            int index = 0;
+            double maxColorDouble = (double) maxColorValue;
+
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int red, green, blue;
+
+                    if (bytesPerSample == 1) {
+                        red = pixelData[index++] & 0xFF;
+                        green = pixelData[index++] & 0xFF;
+                        blue = pixelData[index++] & 0xFF;
+                    } else {
+                        red = ((pixelData[index++] & 0xFF) << 8) | (pixelData[index++] & 0xFF);
+                        green = ((pixelData[index++] & 0xFF) << 8) | (pixelData[index++] & 0xFF);
+                        blue = ((pixelData[index++] & 0xFF) << 8) | (pixelData[index++] & 0xFF);
+                    }
+
+                    double r = red / maxColorDouble;
+                    double g = green / maxColorDouble;
+                    double b = blue / maxColorDouble;
+
+                    Color color = new Color(r, g, b, 1.0);
+                    pixelWriter.setColor(x, y, color);
+                }
+            }
+        } else if (formatType.equals("PGM")) {
+            int bytesPerSample = (maxColorValue < 256) ? 1 : 2;
+            int totalSamples = width * height;
+            int totalBytes = totalSamples * bytesPerSample;
+            byte[] pixelData = new byte[totalBytes];
+            int bytesRead = 0;
+
+            while (bytesRead < totalBytes) {
+                int result = is.read(pixelData, bytesRead, totalBytes - bytesRead);
+                if (result == -1) {
+                    throw new IOException("Unexpected end of file when reading pixel data");
+                }
+                bytesRead += result;
+            }
+
+            int index = 0;
+            double maxColorDouble = (double) maxColorValue;
+
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int grayValue;
+                    if (bytesPerSample == 1) {
+                        grayValue = pixelData[index++] & 0xFF;
+                    } else {
+                        grayValue = ((pixelData[index++] & 0xFF) << 8) | (pixelData[index++] & 0xFF);
+                    }
+
+                    double brightness = grayValue / maxColorDouble;
+                    Color color = Color.gray(brightness);
+                    pixelWriter.setColor(x, y, color);
+                }
+            }
+        } else if (formatType.equals("PBM")) {
+            int rowSize = (width + 7) / 8;
+            byte[] rowData = new byte[rowSize];
+
+            for (int y = 0; y < height; y++) {
+                int bytesRead = 0;
+                while (bytesRead < rowSize) {
+                    int result = is.read(rowData, bytesRead, rowSize - bytesRead);
+                    if (result == -1) {
+                        throw new IOException("Unexpected end of file when reading pixel data");
+                    }
+                    bytesRead += result;
+                }
+
+                for (int x = 0; x < width; x++) {
+                    int byteIndex = x / 8;
+                    int bitIndex = 7 - (x % 8);
+                    int bit = (rowData[byteIndex] >> bitIndex) & 1;
+                    Color color = (bit == 0) ? Color.WHITE : Color.BLACK;
+                    pixelWriter.setColor(x, y, color);
+                }
+            }
+        }
+    }
+
+    private String readNextToken(PushbackInputStream pbis) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int b;
+
+        // Skip initial whitespace
+        while (true) {
+            b = pbis.read();
+            if (b == -1) {
+                break;
+            }
+            if (!Character.isWhitespace(b)) {
+                break;
+            }
+        }
+
+        if (b == -1) {
+            return null;
+        }
+
+        // Read the token
+        do {
+            sb.append((char) b);
+            b = pbis.read();
+        } while (b != -1 && !Character.isWhitespace(b));
+
+        if (b != -1) {
+            pbis.unread(b);
+        }
+
+        return sb.toString();
+    }
+
+    private String readNextNonCommentToken(PushbackInputStream pbis) throws IOException {
+        String token;
+        while (true) {
+            token = readNextToken(pbis);
+            if (token == null) {
+                return null;
+            }
+            if (token.startsWith("#")) {
+                skipComment(pbis);
+                continue;
+            }
+            return token;
+        }
+    }
+
+    private void skipComment(PushbackInputStream pbis) throws IOException {
+        int b;
+        do {
+            b = pbis.read();
+        } while (b != -1 && b != '\n');
     }
 }

@@ -19,14 +19,22 @@
         <Pane fx:id="cubePane" prefWidth="300" prefHeight="200" style="-fx-background-color: lightgray;" />
     </left>
     <top>
-        <ToolBar>
-            <ToggleButton text="Select" fx:id="selectToolButton" toggleGroup="$toolToggleGroup" selected="true"/>
-            <ToggleButton text="Triangle" fx:id="triangleToolButton" toggleGroup="$toolToggleGroup"/>
-            <ToggleButton text="Quadrilateral" fx:id="quadrilateralToolButton" toggleGroup="$toolToggleGroup"/>
-            <ToggleButton text="Ellipse" fx:id="ellipseToolButton" toggleGroup="$toolToggleGroup"/>
-            <ToggleButton fx:id="lineToolButton" text="Line" toggleGroup="$toolToggleGroup" />
-            <ToggleButton fx:id="freehandToolButton" text="Freehand" toggleGroup="$toolToggleGroup" />
-        </ToolBar>
+        <VBox>
+            <MenuBar>
+                <Menu text="File">
+                    <MenuItem fx:id="saveMenuItem" text="Save" />
+                    <MenuItem fx:id="loadMenuItem" text="Load" />
+                </Menu>
+            </MenuBar>
+            <ToolBar>
+                <ToggleButton text="Select" fx:id="selectToolButton" toggleGroup="$toolToggleGroup" selected="true"/>
+                <ToggleButton text="Triangle" fx:id="triangleToolButton" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton text="Quadrilateral" fx:id="quadrilateralToolButton" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton text="Ellipse" fx:id="ellipseToolButton" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="lineToolButton" text="Line" toggleGroup="$toolToggleGroup" />
+                <ToggleButton fx:id="freehandToolButton" text="Freehand" toggleGroup="$toolToggleGroup" />
+            </ToolBar>
+        </VBox>
     </top>
 
     <center>
