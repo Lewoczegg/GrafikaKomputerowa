@@ -1,5 +1,7 @@
 package lewocz.graphics.view;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.fxml.FXML;
 import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
@@ -19,6 +21,8 @@ import lewocz.graphics.event.EventQueue;
 import lewocz.graphics.model.PNMFormat;
 import lewocz.graphics.model.ShapeModel;
 import lewocz.graphics.model.Tool;
+import lewocz.graphics.view.components.DoubleTextField;
+import lewocz.graphics.view.components.IntegerTextField;
 import lewocz.graphics.viewmodel.IMainViewModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,47 +63,47 @@ public class MainView {
     @FXML
     private Slider redSlider;
     @FXML
-    private TextField redTextField;
+    private IntegerTextField redTextField;
     @FXML
     private Slider greenSlider;
     @FXML
-    private TextField greenTextField;
+    private IntegerTextField greenTextField;
     @FXML
     private Slider blueSlider;
     @FXML
-    private TextField blueTextField;
+    private IntegerTextField blueTextField;
 
     // CMYK Controls
     @FXML
     private Slider cyanSlider;
     @FXML
-    private TextField cyanTextField;
+    private DoubleTextField cyanTextField;
     @FXML
     private Slider magentaSlider;
     @FXML
-    private TextField magentaTextField;
+    private DoubleTextField magentaTextField;
     @FXML
     private Slider yellowSlider;
     @FXML
-    private TextField yellowTextField;
+    private DoubleTextField yellowTextField;
     @FXML
     private Slider keySlider;
     @FXML
-    private TextField keyTextField;
+    private DoubleTextField keyTextField;
 
     // HSV Controls
     @FXML
     private Slider hueSlider;
     @FXML
-    private TextField hueTextField;
+    private DoubleTextField hueTextField;
     @FXML
     private Slider saturationSlider;
     @FXML
-    private TextField saturationTextField;
+    private DoubleTextField saturationTextField;
     @FXML
     private Slider valueSlider;
     @FXML
-    private TextField valueTextField;
+    private DoubleTextField valueTextField;
 
     @FXML
     private Pane canvasPane;
@@ -214,38 +218,18 @@ public class MainView {
     }
 
     private void bindColorProperties() {
-        // RGB bindings
-        redSlider.valueProperty().bindBidirectional(mainViewModel.redProperty());
-        redTextField.textProperty().bindBidirectional(mainViewModel.redProperty(), new NumberStringConverter());
+        setupIntegerField(redTextField, mainViewModel.redProperty(), redSlider);
+        setupIntegerField(greenTextField, mainViewModel.greenProperty(), greenSlider);
+        setupIntegerField(blueTextField, mainViewModel.blueProperty(), blueSlider);
 
-        greenSlider.valueProperty().bindBidirectional(mainViewModel.greenProperty());
-        greenTextField.textProperty().bindBidirectional(mainViewModel.greenProperty(), new NumberStringConverter());
+        setupDoubleField(cyanTextField, mainViewModel.cyanProperty(), cyanSlider);
+        setupDoubleField(magentaTextField, mainViewModel.magentaProperty(), magentaSlider);
+        setupDoubleField(yellowTextField, mainViewModel.yellowProperty(), yellowSlider);
+        setupDoubleField(keyTextField, mainViewModel.keyProperty(), keySlider);
 
-        blueSlider.valueProperty().bindBidirectional(mainViewModel.blueProperty());
-        blueTextField.textProperty().bindBidirectional(mainViewModel.blueProperty(), new NumberStringConverter());
-
-        // CMYK bindings
-        cyanSlider.valueProperty().bindBidirectional(mainViewModel.cyanProperty());
-        cyanTextField.textProperty().bindBidirectional(mainViewModel.cyanProperty(), new NumberStringConverter());
-
-        magentaSlider.valueProperty().bindBidirectional(mainViewModel.magentaProperty());
-        magentaTextField.textProperty().bindBidirectional(mainViewModel.magentaProperty(), new NumberStringConverter());
-
-        yellowSlider.valueProperty().bindBidirectional(mainViewModel.yellowProperty());
-        yellowTextField.textProperty().bindBidirectional(mainViewModel.yellowProperty(), new NumberStringConverter());
-
-        keySlider.valueProperty().bindBidirectional(mainViewModel.keyProperty());
-        keyTextField.textProperty().bindBidirectional(mainViewModel.keyProperty(), new NumberStringConverter());
-
-        // HSV bindings
-        hueSlider.valueProperty().bindBidirectional(mainViewModel.hueProperty());
-        hueTextField.textProperty().bindBidirectional(mainViewModel.hueProperty(), new NumberStringConverter());
-
-        saturationSlider.valueProperty().bindBidirectional(mainViewModel.saturationProperty());
-        saturationTextField.textProperty().bindBidirectional(mainViewModel.saturationProperty(), new NumberStringConverter());
-
-        valueSlider.valueProperty().bindBidirectional(mainViewModel.valueProperty());
-        valueTextField.textProperty().bindBidirectional(mainViewModel.valueProperty(), new NumberStringConverter());
+        setupDoubleField(hueTextField, mainViewModel.hueProperty(), hueSlider);
+        setupDoubleField(saturationTextField, mainViewModel.saturationProperty(), saturationSlider);
+        setupDoubleField(valueTextField, mainViewModel.valueProperty(), valueSlider);
 
         // Update color preview and labels
         mainViewModel.selectedColorProperty().addListener((obs, oldColor, newColor) -> {
@@ -270,6 +254,16 @@ public class MainView {
 
         // Initialize the color preview
         colorPreview.setFill(mainViewModel.selectedColorProperty().get());
+    }
+
+    private void setupIntegerField(TextField textField, IntegerProperty property, Slider slider) {
+        slider.valueProperty().bindBidirectional(property);
+        textField.textProperty().bindBidirectional(property, new NumberStringConverter());
+    }
+
+    private void setupDoubleField(TextField textField, DoubleProperty property, Slider slider) {
+        slider.valueProperty().bindBidirectional(property);
+        textField.textProperty().bindBidirectional(property, new NumberStringConverter());
     }
 
     private void setupCanvasListeners() {
