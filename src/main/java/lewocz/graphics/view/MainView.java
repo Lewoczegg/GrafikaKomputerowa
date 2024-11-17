@@ -18,6 +18,7 @@ import lewocz.graphics.command.*;
 import lewocz.graphics.event.EventQueue;
 import lewocz.graphics.model.PNMFormat;
 import lewocz.graphics.model.ShapeModel;
+import lewocz.graphics.model.Tool;
 import lewocz.graphics.viewmodel.IMainViewModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,10 +190,18 @@ public class MainView {
     }
 
     private void bindProperties() {
+        selectToolButton.setUserData(Tool.SELECT);
+        triangleToolButton.setUserData(Tool.TRIANGLE);
+        quadrilateralToolButton.setUserData(Tool.QUADRILATERAL);
+        ellipseToolButton.setUserData(Tool.ELLIPSE);
+        lineToolButton.setUserData(Tool.LINE);
+        freehandToolButton.setUserData(Tool.FREEHAND);
+
         toolToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle != null) {
                 ToggleButton selectedButton = (ToggleButton) newToggle;
-                Command command = new SetToolCommand(mainViewModel, selectedButton.getText());
+                Tool selectedTool = (Tool) selectedButton.getUserData();
+                Command command = new SetToolCommand(mainViewModel, selectedTool);
                 eventQueue.enqueue(command);
             }
         });

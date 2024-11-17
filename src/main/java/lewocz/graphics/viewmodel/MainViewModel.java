@@ -22,14 +22,13 @@ import java.io.*;
 public class MainViewModel implements IMainViewModel {
     private static final Logger logger = LoggerFactory.getLogger(MainViewModel.class);
 
-
     @Getter
     private final ObservableList<ShapeModel> shapes = FXCollections.observableArrayList();
 
     private ObjectProperty<ShapeModel> tempShape = new SimpleObjectProperty<>();
 
     private final ObjectProperty<ShapeModel> currentShape = new SimpleObjectProperty<>();
-    private final StringProperty toolSelected = new SimpleStringProperty("Select");
+    private final ObjectProperty<Tool> toolSelected = new SimpleObjectProperty<>(Tool.SELECT);
 
     // Color Properties
     private final IntegerProperty red = new SimpleIntegerProperty(0);
@@ -83,8 +82,12 @@ public class MainViewModel implements IMainViewModel {
         return tempShape.get();
     }
 
-    public void setToolSelected(String tool) {
+    public void setSelectedTool(Tool tool) {
         toolSelected.set(tool);
+    }
+
+    public Tool getSelectedTool() {
+        return toolSelected.get();
     }
 
     @Override
@@ -93,18 +96,18 @@ public class MainViewModel implements IMainViewModel {
         startY = y;
         isDragging = true;
 
-        String tool = toolSelected.get();
+        Tool tool = getSelectedTool();
         switch (tool) {
-            case "Select":
+            case SELECT:
                 selectShapeAt(x, y);
                 break;
-            case "Triangle":
-            case "Quadrilateral":
-            case "Ellipse":
-            case "Line":
+            case TRIANGLE:
+            case QUADRILATERAL:
+            case ELLIPSE:
+            case LINE:
                 tempShape.set(createShape(tool, startX, startY, startX, startY));
                 break;
-            case "Freehand":
+            case FREEHAND:
                 FreehandModel freehand = new FreehandModel();
                 freehand.addPoint(x, y);
                 tempShape.set(freehand);
@@ -123,9 +126,9 @@ public class MainViewModel implements IMainViewModel {
         double endX = x;
         double endY = y;
 
-        String tool = toolSelected.get();
+        Tool tool = getSelectedTool();
         switch (tool) {
-            case "Select":
+            case SELECT:
                 if (currentShape.get() != null) {
                     double deltaX = endX - startX;
                     double deltaY = endY - startY;
@@ -134,13 +137,13 @@ public class MainViewModel implements IMainViewModel {
                     startY = endY;
                 }
                 break;
-            case "Triangle":
-            case "Quadrilateral":
-            case "Ellipse":
-            case "Line":
+            case TRIANGLE:
+            case QUADRILATERAL:
+            case ELLIPSE:
+            case LINE:
                 updateTempShape(tempShape.get(), startX, startY, endX, endY);
                 break;
-            case "Freehand":
+            case FREEHAND:
                 if (tempShape.get() instanceof FreehandModel) {
                     ((FreehandModel) tempShape.get()).addPoint(endX, endY);
                 }
@@ -157,12 +160,12 @@ public class MainViewModel implements IMainViewModel {
         if (!isDragging) return;
         isDragging = false;
 
-        String tool = toolSelected.get();
+        Tool tool = getSelectedTool();
         switch (tool) {
-            case "Triangle":
-            case "Quadrilateral":
-            case "Ellipse":
-            case "Line":
+            case TRIANGLE:
+            case QUADRILATERAL:
+            case ELLIPSE:
+            case LINE:
                 if (tempShape != null) {
                     tempShape.get().setStrokeColor(strokeColor.get());
                     tempShape.get().setFillColor(fillColor.get());
@@ -171,7 +174,7 @@ public class MainViewModel implements IMainViewModel {
                     tempShape.set(null);
                 }
                 break;
-            case "Freehand":
+            case FREEHAND:
                 if (tempShape.get() instanceof FreehandModel) {
                     tempShape.get().setStrokeColor(strokeColor.get());
                     tempShape.get().setStrokeWidth(strokeWidth.get());
@@ -206,23 +209,23 @@ public class MainViewModel implements IMainViewModel {
         }
     }
 
-    private ShapeModel createShape(String tool, double x1, double y1, double x2, double y2) {
+    private ShapeModel createShape(Tool tool, double x1, double y1, double x2, double y2) {
         switch (tool) {
-            case "Triangle":
+            case TRIANGLE:
                 double[] xPoints = {x1, x2, x1};
                 double[] yPoints = {y1, y2, y2};
                 return new TriangleModel(xPoints, yPoints);
-            case "Quadrilateral":
+            case QUADRILATERAL:
                 double[] quadXPoints = {x1, x2, x2, x1};
                 double[] quadYPoints = {y1, y1, y2, y2};
                 return new QuadrilateralModel(quadXPoints, quadYPoints);
-            case "Ellipse":
+            case ELLIPSE:
                 double centerX = (x1 + x2) / 2;
                 double centerY = (y1 + y2) / 2;
                 double radiusX = Math.abs(x2 - x1) / 2;
                 double radiusY = Math.abs(y2 - y1) / 2;
                 return new EllipseModel(centerX, centerY, radiusX, radiusY);
-            case "Line":
+            case LINE:
                 return new LineModel(x1, y1, x2, y2);
             default:
                 return null;

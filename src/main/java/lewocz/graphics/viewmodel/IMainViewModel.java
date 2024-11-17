@@ -9,6 +9,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import lewocz.graphics.model.PNMFormat;
 import lewocz.graphics.model.ShapeModel;
+import lewocz.graphics.model.Tool;
 
 
 public interface IMainViewModel {
@@ -18,7 +19,7 @@ public interface IMainViewModel {
     ShapeModel getTempShape();
 
     // Tool Selection Property
-    void setToolSelected(String tool);
+    void setSelectedTool(Tool tool);
 
     // RGB Properties
     IntegerProperty redProperty();
