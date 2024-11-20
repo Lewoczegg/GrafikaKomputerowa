@@ -5,11 +5,14 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Group;
+import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import lewocz.graphics.model.*;
+import lewocz.graphics.utils.ImageProcessor;
 import lewocz.graphics.utils.PNMImageIO;
 import lewocz.graphics.utils.ColorUtils;
 import lombok.Getter;
@@ -90,6 +93,17 @@ public class MainViewModel implements IMainViewModel {
     public Tool getSelectedTool() {
         return toolSelected.get();
     }
+
+    private ImageModel currentImageModel;
+
+    public ImageModel getCurrentImageModel() {
+        return currentImageModel;
+    }
+
+    public void setCurrentImageModel(ImageModel imageModel) {
+        this.currentImageModel = imageModel;
+    }
+
 
     @Override
     public void onMousePressed(double x, double y) {
@@ -418,20 +432,141 @@ public class MainViewModel implements IMainViewModel {
     }
 
     @Override
-    public void saveImage(String fileName, PNMFormat format, boolean binaryFormat, WritableImage image) {
-        try {
-            PNMImageIO.savePNM(fileName, image, format, binaryFormat);
-        } catch (IOException e) {
-            logger.error("Failed to save image", e);
+    public void applyAddition(double addRed, double addGreen, double addBlue) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.addRGB(currentImageModel.getImage(), addRed, addGreen, addBlue);
+            currentImageModel.setImage(result);
+            requestRedraw();
         }
     }
+
+    @Override
+    public void applySubtraction(double subRed, double subGreen, double subBlue) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.subtractRGB(currentImageModel.getImage(), subRed, subGreen, subBlue);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyMultiplication(double mulRed, double mulGreen, double mulBlue) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.multiplyRGB(currentImageModel.getImage(), mulRed, mulGreen, mulBlue);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyDivision(double divRed, double divGreen, double divBlue) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.divideRGB(currentImageModel.getImage(), divRed, divGreen, divBlue);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void adjustBrightness(double brightnessChange) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.adjustBrightness(currentImageModel.getImage(), brightnessChange);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyGrayscaleAverage() {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.grayscaleAverage(currentImageModel.getImage());
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyGrayscaleMax() {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.grayscaleMax(currentImageModel.getImage());
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    // Filter Methods
+
+    @Override
+    public void applySmoothingFilter() {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.applySmoothingFilter(currentImageModel.getImage());
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyMedianFilter() {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.applyMedianFilter(currentImageModel.getImage());
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applySobelFilter() {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.applySobelFilter(currentImageModel.getImage());
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyHighPassFilter() {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.applyHighPassFilter(currentImageModel.getImage());
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyGaussianBlur(int kernelSize, double sigma) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.applyGaussianBlur(currentImageModel.getImage(), kernelSize, sigma);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyCustomConvolution(double[][] kernel) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.applyConvolutionFilter(currentImageModel.getImage(), kernel);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    // Improving the Apple Image
+    public void improveAppleImage() {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.applyMedianFilter(currentImageModel.getImage());
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    // Load and Save Methods
 
     @Override
     public void loadImage(String fileName, PNMFormat format) {
         try {
             WritableImage image = PNMImageIO.loadPNM(fileName, format);
             ImageModel imageModel = new ImageModel(image, 0, 0);
-
+            setCurrentImageModel(imageModel);
             Platform.runLater(() -> {
                 shapes.clear();
                 shapes.add(imageModel);
@@ -439,6 +574,47 @@ public class MainViewModel implements IMainViewModel {
             });
         } catch (IOException e) {
             logger.error("Failed to load image", e);
+        }
+    }
+
+    @Override
+    public void loadStandardImage(String fileName) {
+        try {
+            // Load the image using JavaFX's built-in methods
+            Image image = new Image(new FileInputStream(fileName));
+
+            // Convert Image to WritableImage
+            WritableImage writableImage = new WritableImage(
+                    image.getPixelReader(),
+                    (int) image.getWidth(),
+                    (int) image.getHeight()
+            );
+
+            ImageModel imageModel = new ImageModel(writableImage, 0, 0);
+            setCurrentImageModel(imageModel);
+            Platform.runLater(() -> {
+                shapes.clear();
+                shapes.add(imageModel);
+                requestRedraw();
+            });
+        } catch (IOException e) {
+            logger.error("Failed to load image", e);
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Load Error");
+                alert.setHeaderText("Failed to load the image.");
+                alert.setContentText(e.getMessage());
+                alert.showAndWait();
+            });
+        }
+    }
+
+    @Override
+    public void saveImage(String fileName, PNMFormat format, boolean binaryFormat, WritableImage image) {
+        try {
+            PNMImageIO.savePNM(fileName, image, format, binaryFormat);
+        } catch (IOException e) {
+            logger.error("Failed to save image", e);
         }
     }
 

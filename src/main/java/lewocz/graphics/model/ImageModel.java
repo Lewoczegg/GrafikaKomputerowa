@@ -2,8 +2,13 @@ package lewocz.graphics.model;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ImageModel extends ShapeModel {
+
     private WritableImage image;
     private double x;
     private double y;
@@ -21,9 +26,8 @@ public class ImageModel extends ShapeModel {
 
     @Override
     public boolean containsPoint(double x, double y) {
-        double width = image.getWidth();
-        double height = image.getHeight();
-        return x >= this.x && x <= (this.x + width) && y >= this.y && y <= (this.y + height);
+        return x >= this.x && x <= this.x + image.getWidth() &&
+                y >= this.y && y <= this.y + image.getHeight();
     }
 
     @Override

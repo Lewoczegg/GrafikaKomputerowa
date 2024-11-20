@@ -51,4 +51,19 @@ public interface IMainViewModel {
 
     void saveImage(String fileName, PNMFormat format, boolean binaryFormat, WritableImage image);
     void loadImage(String fileName, PNMFormat format);
+    void loadStandardImage(String fileName);
+
+    void applyAddition(double addRed, double addGreen, double addBlue);
+    void applySubtraction(double subRed, double subGreen, double subBlue);
+    void applyMultiplication(double mulRed, double mulGreen, double mulBlue);
+    void applyDivision(double divRed, double divGreen, double divBlue);
+    void adjustBrightness(double brightnessChange);
+    void applyGrayscaleAverage();
+    void applyGrayscaleMax();
+    void applySmoothingFilter();
+    void applyMedianFilter();
+    void applySobelFilter();
+    void applyHighPassFilter();
+    void applyGaussianBlur(int kernelSize, double sigma);
+    void applyCustomConvolution(double[][] kernel);
 }

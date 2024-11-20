@@ -150,6 +150,136 @@
                             </VBox>
                         </content>
                     </Tab>
+                    <!-- Image Operations Tab -->
+                    <Tab text="Image Operations">
+                        <content>
+                            <ScrollPane fitToWidth="true">
+                                <VBox spacing="10">
+                                    <padding>
+                                        <Insets top="10" right="10" bottom="10" left="10" />
+                                    </padding>
+                                    <!-- Addition -->
+                                    <TitledPane text="Addition" expanded="false">
+                                        <VBox spacing="5">
+                                            <HBox spacing="5">
+                                                <Label text="Add R:" />
+                                                <IntegerTextField fx:id="addRedField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="Add G:" />
+                                                <IntegerTextField fx:id="addGreenField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="Add B:" />
+                                                <IntegerTextField fx:id="addBlueField" prefWidth="50" />
+                                            </HBox>
+                                            <Button fx:id="applyAdditionButton" text="Apply Addition" />
+                                        </VBox>
+                                    </TitledPane>
+                                    <!-- Subtraction -->
+                                    <TitledPane text="Subtraction" expanded="false">
+                                        <VBox spacing="5">
+                                            <HBox spacing="5">
+                                                <Label text="Subtract R:" />
+                                                <IntegerTextField fx:id="subRedField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="Subtract G:" />
+                                                <IntegerTextField fx:id="subGreenField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="Subtract B:" />
+                                                <IntegerTextField fx:id="subBlueField" prefWidth="50" />
+                                            </HBox>
+                                            <Button fx:id="applySubtractionButton" text="Apply Subtraction" />
+                                        </VBox>
+                                    </TitledPane>
+                                    <!-- Multiplication -->
+                                    <TitledPane text="Multiplication" expanded="false">
+                                        <VBox spacing="5">
+                                            <HBox spacing="5">
+                                                <Label text="Multiply R:" />
+                                                <TextField fx:id="mulRedField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="Multiply G:" />
+                                                <TextField fx:id="mulGreenField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="Multiply B:" />
+                                                <TextField fx:id="mulBlueField" prefWidth="50" />
+                                            </HBox>
+                                            <Button fx:id="applyMultiplicationButton" text="Apply Multiplication" />
+                                        </VBox>
+                                    </TitledPane>
+                                    <!-- Division -->
+                                    <TitledPane text="Division" expanded="false">
+                                        <VBox spacing="5">
+                                            <HBox spacing="5">
+                                                <Label text="Divide R:" />
+                                                <TextField fx:id="divRedField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="Divide G:" />
+                                                <TextField fx:id="divGreenField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="Divide B:" />
+                                                <TextField fx:id="divBlueField" prefWidth="50" />
+                                            </HBox>
+                                            <Button fx:id="applyDivisionButton" text="Apply Division" />
+                                        </VBox>
+                                    </TitledPane>
+                                    <!-- Brightness Adjustment -->
+                                    <TitledPane text="Brightness Adjustment" expanded="false">
+                                        <VBox spacing="5">
+                                            <HBox spacing="5">
+                                                <Label text="Brightness Change:" />
+                                                <TextField fx:id="brightnessField" prefWidth="50" />
+                                            </HBox>
+                                            <Button fx:id="adjustBrightnessButton" text="Adjust Brightness" />
+                                        </VBox>
+                                    </TitledPane>
+                                    <!-- Grayscale -->
+                                    <TitledPane text="Grayscale" expanded="false">
+                                        <VBox spacing="5">
+                                            <Button fx:id="grayscaleAverageButton" text="Grayscale (Average)" />
+                                            <Button fx:id="grayscaleMaxButton" text="Grayscale (Max)" />
+                                        </VBox>
+                                    </TitledPane>
+                                    <!-- Filters -->
+                                    <TitledPane text="Filters" expanded="false">
+                                        <VBox spacing="5">
+                                            <Button fx:id="applySmoothingFilterButton" text="Smoothing Filter" />
+                                            <Button fx:id="applyMedianFilterButton" text="Median Filter" />
+                                            <Button fx:id="applySobelFilterButton" text="Sobel Filter" />
+                                            <Button fx:id="applyHighPassFilterButton" text="High-Pass Filter" />
+                                        </VBox>
+                                    </TitledPane>
+                                    <!-- Gaussian Blur -->
+                                    <TitledPane text="Gaussian Blur" expanded="false">
+                                        <VBox spacing="5">
+                                            <HBox spacing="5">
+                                                <Label text="Kernel Size:" />
+                                                <IntegerTextField fx:id="gaussianKernelSizeField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="Sigma:" />
+                                                <TextField fx:id="gaussianSigmaField" prefWidth="50" />
+                                            </HBox>
+                                            <Button fx:id="applyGaussianBlurButton" text="Apply Gaussian Blur" />
+                                        </VBox>
+                                    </TitledPane>
+                                    <!-- Custom Convolution -->
+                                    <TitledPane text="Custom Convolution" expanded="false">
+                                        <VBox spacing="5">
+                                            <Button fx:id="applyCustomConvolutionButton" text="Apply Custom Convolution" />
+                                        </VBox>
+                                    </TitledPane>
+                                </VBox>
+                            </ScrollPane>
+                        </content>
+                    </Tab>
                 </tabs>
             </TabPane>
         </VBox>

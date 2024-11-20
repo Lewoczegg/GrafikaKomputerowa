@@ -16,6 +16,10 @@ public class LoadCommand implements Command {
 
     @Override
     public void execute() {
-        viewModel.loadImage(fileName, format);
+        if (format != null) {
+            viewModel.loadImage(fileName, format);
+        } else {
+            viewModel.loadStandardImage(fileName);
+        }
     }
 }

@@ -118,6 +118,75 @@ public class MainView {
     @FXML
     private MenuItem loadMenuItem;
 
+    @FXML
+    private IntegerTextField addRedField;
+    @FXML
+    private IntegerTextField addGreenField;
+    @FXML
+    private IntegerTextField addBlueField;
+    @FXML
+    private Button applyAdditionButton;
+
+    @FXML
+    private IntegerTextField subRedField;
+    @FXML
+    private IntegerTextField subGreenField;
+    @FXML
+    private IntegerTextField subBlueField;
+    @FXML
+    private Button applySubtractionButton;
+
+    // Multiplication Controls
+    @FXML
+    private TextField mulRedField;
+    @FXML
+    private TextField mulGreenField;
+    @FXML
+    private TextField mulBlueField;
+    @FXML
+    private Button applyMultiplicationButton;
+
+    // Division Controls
+    @FXML
+    private TextField divRedField;
+    @FXML
+    private TextField divGreenField;
+    @FXML
+    private TextField divBlueField;
+    @FXML
+    private Button applyDivisionButton;
+
+    @FXML
+    private TextField brightnessField;
+    @FXML
+    private Button adjustBrightnessButton;
+
+    @FXML
+    private Button grayscaleAverageButton;
+    @FXML
+    private Button grayscaleMaxButton;
+
+    @FXML
+    private Button applySmoothingFilterButton;
+    @FXML
+    private Button applyMedianFilterButton;
+    @FXML
+    private Button applySobelFilterButton;
+    @FXML
+    private Button applyHighPassFilterButton;
+    @FXML
+    private IntegerTextField gaussianKernelSizeField;
+    @FXML
+    private TextField gaussianSigmaField;
+    @FXML
+    private Button applyGaussianBlurButton;
+
+    @FXML
+    private Button applyCustomConvolutionButton;
+
+    @FXML
+    private ProgressIndicator loadingIndicator;
+
     private Group root3D;
     private double mousePosX, mousePosY;
     private double mouseOldX, mouseOldY;
@@ -142,6 +211,171 @@ public class MainView {
         setUp3DScene();
         mainViewModel.setRedrawCanvasCallback(this::redrawCanvas);
         redrawCanvas();
+    }
+
+    private void onApplyAddition() {
+        try {
+            double addRed = Double.parseDouble(addRedField.getText());
+            double addGreen = Double.parseDouble(addGreenField.getText());
+            double addBlue = Double.parseDouble(addBlueField.getText());
+
+            Command command = new ApplyAdditionCommand(mainViewModel, addRed, addGreen, addBlue);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter valid numbers for addition values.");
+        }
+    }
+
+    private void onApplySubtraction() {
+        try {
+            double subRed = Double.parseDouble(subRedField.getText());
+            double subGreen = Double.parseDouble(subGreenField.getText());
+            double subBlue = Double.parseDouble(subBlueField.getText());
+            Command command = new ApplySubtractionCommand(mainViewModel, subRed, subGreen, subBlue);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter valid numbers for subtraction values.");
+        }
+    }
+
+    private void onApplyMultiplication() {
+        try {
+            double mulRed = Double.parseDouble(mulRedField.getText());
+            double mulGreen = Double.parseDouble(mulGreenField.getText());
+            double mulBlue = Double.parseDouble(mulBlueField.getText());
+            Command command = new ApplyMultiplicationCommand(mainViewModel, mulRed, mulGreen, mulBlue);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter valid numbers for multiplication values.");
+        }
+    }
+
+    private void onApplyDivision() {
+        try {
+            double divRed = Double.parseDouble(divRedField.getText());
+            double divGreen = Double.parseDouble(divGreenField.getText());
+            double divBlue = Double.parseDouble(divBlueField.getText());
+
+            if (divRed == 0 || divGreen == 0 || divBlue == 0) {
+                showAlert("Division by Zero", "Division values cannot be zero.");
+                return;
+            }
+
+            Command command = new ApplyDivisionCommand(mainViewModel, divRed, divGreen, divBlue);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter valid numbers for division values.");
+        }
+    }
+
+    private void onAdjustBrightness() {
+        try {
+            double brightnessChange = Double.parseDouble(brightnessField.getText());
+            Command command = new AdjustBrightnessCommand(mainViewModel, brightnessChange);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter a valid number for brightness change.");
+        }
+    }
+
+    private void onApplyGrayscaleAverage() {
+        Command command = new ApplyGrayscaleAverageCommand(mainViewModel);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplyGrayscaleMax() {
+        Command command = new ApplyGrayscaleMaxCommand(mainViewModel);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplySmoothingFilter() {
+        Command command = new ApplySmoothingFilterCommand(mainViewModel);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplyMedianFilter() {
+        Command command = new ApplyMedianFilterCommand(mainViewModel);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplySobelFilter() {
+        Command command = new ApplySobelFilterCommand(mainViewModel);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplyHighPassFilter() {
+        Command command = new ApplyHighPassFilterCommand(mainViewModel);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplyGaussianBlur() {
+        try {
+            int kernelSize = Integer.parseInt(gaussianKernelSizeField.getText());
+            double sigma = Double.parseDouble(gaussianSigmaField.getText());
+
+            if (kernelSize % 2 == 0 || kernelSize <= 0) {
+                showAlert("Invalid Kernel Size", "Kernel size must be a positive odd integer.");
+                return;
+            }
+
+            if (sigma <= 0) {
+                showAlert("Invalid Sigma Value", "Sigma must be a positive number.");
+                return;
+            }
+
+            Command command = new ApplyGaussianBlurCommand(mainViewModel, kernelSize, sigma);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter valid numbers for kernel size and sigma.");
+        }
+    }
+
+    private void onApplyCustomConvolution() {
+        try {
+            TextInputDialog sizeDialog = new TextInputDialog("3");
+            sizeDialog.setTitle("Custom Convolution");
+            sizeDialog.setHeaderText("Enter Kernel Size");
+            sizeDialog.setContentText("Kernel Size (positive odd integer):");
+            Optional<String> sizeResult = sizeDialog.showAndWait();
+
+            if (sizeResult.isPresent()) {
+                int size = Integer.parseInt(sizeResult.get());
+
+                if (size % 2 == 0 || size <= 0) {
+                    showAlert("Invalid Kernel Size", "Kernel size must be a positive odd integer.");
+                    return;
+                }
+
+                double[][] kernel = new double[size][size];
+
+                for (int y = 0; y < size; y++) {
+                    for (int x = 0; x < size; x++) {
+                        TextInputDialog valueDialog = new TextInputDialog("0");
+                        valueDialog.setTitle("Custom Convolution");
+                        valueDialog.setHeaderText("Enter Kernel Value");
+                        valueDialog.setContentText("Value at (" + x + ", " + y + "):");
+                        Optional<String> valueResult = valueDialog.showAndWait();
+
+                        if (valueResult.isPresent()) {
+                            try {
+                                double value = Double.parseDouble(valueResult.get());
+                                kernel[y][x] = value;
+                            } catch (NumberFormatException e) {
+                                showAlert("Invalid Input", "Please enter a valid number for kernel value.");
+                                return;
+                            }
+                        } else {
+                            return; // User cancelled
+                        }
+                    }
+                }
+
+                Command command = new ApplyCustomConvolutionCommand(mainViewModel, kernel);
+                eventQueue.enqueue(command);
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter a valid number for kernel size.");
+        }
     }
 
     private void setUp3DScene() {
@@ -215,6 +449,22 @@ public class MainView {
 
         saveMenuItem.setOnAction(e -> onSaveMenuItemClicked());
         loadMenuItem.setOnAction(e -> onLoadMenuItemClicked());
+
+        applyAdditionButton.setOnAction(e -> onApplyAddition());
+        applySubtractionButton.setOnAction(e -> onApplySubtraction());
+        applyMultiplicationButton.setOnAction(e -> onApplyMultiplication());
+        applyDivisionButton.setOnAction(e -> onApplyDivision());
+
+        adjustBrightnessButton.setOnAction(e -> onAdjustBrightness());
+        grayscaleAverageButton.setOnAction(e -> onApplyGrayscaleAverage());
+        grayscaleMaxButton.setOnAction(e -> onApplyGrayscaleMax());
+
+        applySmoothingFilterButton.setOnAction(e -> onApplySmoothingFilter());
+        applyMedianFilterButton.setOnAction(e -> onApplyMedianFilter());
+        applySobelFilterButton.setOnAction(e -> onApplySobelFilter());
+        applyHighPassFilterButton.setOnAction(e -> onApplyHighPassFilter());
+        applyGaussianBlurButton.setOnAction(e -> onApplyGaussianBlur());
+        applyCustomConvolutionButton.setOnAction(e -> onApplyCustomConvolution());
     }
 
     private void bindColorProperties() {
@@ -377,6 +627,11 @@ public class MainView {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Image File");
         fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("All Image Files", "*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.pbm", "*.pgm", "*.ppm"),
+                new FileChooser.ExtensionFilter("JPEG Files", "*.jpg", "*.jpeg"),
+                new FileChooser.ExtensionFilter("PNG Files", "*.png"),
+                new FileChooser.ExtensionFilter("BMP Files", "*.bmp"),
+                new FileChooser.ExtensionFilter("GIF Files", "*.gif"),
                 new FileChooser.ExtensionFilter("PNM Files", "*.pbm", "*.pgm", "*.ppm")
         );
         File file = fileChooser.showOpenDialog(null);
@@ -390,16 +645,24 @@ public class MainView {
                 format = PNMFormat.PGM;
             } else if (fileName.endsWith(".ppm")) {
                 format = PNMFormat.PPM;
+            } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || fileName.endsWith(".png")
+                    || fileName.endsWith(".bmp") || fileName.endsWith(".gif")) {
+                format = null; // Standard image formats
             } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Unsupported File");
-                alert.setHeaderText("The selected file format is not supported.");
-                alert.showAndWait();
+                showAlert("Unsupported File Format", "The selected file format is not supported.");
                 return;
             }
 
             Command command = new LoadCommand(mainViewModel, file.getAbsolutePath(), format);
             eventQueue.enqueue(command);
         }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
