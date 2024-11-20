@@ -246,27 +246,43 @@ public class ImageProcessor {
         PixelReader reader = inputImage.getPixelReader();
         PixelWriter writer = outputImage.getPixelWriter();
 
-        for (int y = kHalfHeight; y < height - kHalfHeight; y++) {
-            for (int x = kHalfWidth; x < width - kHalfWidth; x++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 double sumRed = 0.0;
                 double sumGreen = 0.0;
                 double sumBlue = 0.0;
+                double sumKernel = 0.0;
 
                 for (int ky = -kHalfHeight; ky <= kHalfHeight; ky++) {
                     for (int kx = -kHalfWidth; kx <= kHalfWidth; kx++) {
-                        Color color = reader.getColor(x + kx, y + ky);
+                        int pixelX = x + kx;
+                        int pixelY = y + ky;
+
+                        if (pixelX < 0 || pixelX >= width || pixelY < 0 || pixelY >= height) {
+                            continue;
+                        }
+
+                        Color color = reader.getColor(pixelX, pixelY);
                         double kernelValue = kernel[ky + kHalfHeight][kx + kHalfWidth];
+
                         sumRed += color.getRed() * kernelValue;
                         sumGreen += color.getGreen() * kernelValue;
                         sumBlue += color.getBlue() * kernelValue;
+                        sumKernel += kernelValue;
                     }
+                }
+
+                if (sumKernel != 0) {
+                    sumRed /= sumKernel;
+                    sumGreen /= sumKernel;
+                    sumBlue /= sumKernel;
                 }
 
                 Color newColor = new Color(
                         clamp(sumRed),
                         clamp(sumGreen),
                         clamp(sumBlue),
-                        1.0
+                        reader.getColor(x, y).getOpacity()
                 );
                 writer.setColor(x, y, newColor);
             }
