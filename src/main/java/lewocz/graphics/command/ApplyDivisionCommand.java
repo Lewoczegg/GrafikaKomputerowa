@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplyDivisionCommand implements Command {
@@ -17,6 +18,11 @@ public class ApplyDivisionCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applyDivision(divRed, divGreen, divBlue);
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applyDivision(divRed, divGreen, divBlue);
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplySobelFilterCommand implements Command {
@@ -11,6 +12,11 @@ public class ApplySobelFilterCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applySobelFilter();
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applySobelFilter();
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

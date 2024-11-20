@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplyGrayscaleMaxCommand implements Command {
@@ -11,6 +12,11 @@ public class ApplyGrayscaleMaxCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applyGrayscaleMax();
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applyGrayscaleMax();
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

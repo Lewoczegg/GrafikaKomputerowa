@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplyMultiplicationCommand implements Command {
@@ -17,6 +18,11 @@ public class ApplyMultiplicationCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applyMultiplication(mulRed, mulGreen, mulBlue);
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applyMultiplication(mulRed, mulGreen, mulBlue);
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

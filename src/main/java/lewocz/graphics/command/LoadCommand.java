@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.model.PNMFormat;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
@@ -16,10 +17,15 @@ public class LoadCommand implements Command {
 
     @Override
     public void execute() {
-        if (format != null) {
-            viewModel.loadImage(fileName, format);
-        } else {
-            viewModel.loadStandardImage(fileName);
+        Platform.runLater(() -> viewModel.setIsProcessing(true));
+        try {
+            if (format != null) {
+                viewModel.loadImage(fileName, format);
+            } else {
+                viewModel.loadStandardImage(fileName);
+            }
+        } finally {
+            Platform.runLater(() -> viewModel.setIsProcessing(false));
         }
     }
 }

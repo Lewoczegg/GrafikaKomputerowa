@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplySmoothingFilterCommand implements Command {
@@ -11,6 +12,11 @@ public class ApplySmoothingFilterCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applySmoothingFilter();
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applySmoothingFilter();
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

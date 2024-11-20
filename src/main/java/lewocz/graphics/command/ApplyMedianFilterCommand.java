@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplyMedianFilterCommand implements Command {
@@ -12,6 +13,11 @@ public class ApplyMedianFilterCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applyMedianFilter();
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applyMedianFilter();
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

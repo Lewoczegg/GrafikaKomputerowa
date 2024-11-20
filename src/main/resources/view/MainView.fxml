@@ -42,6 +42,7 @@
     <center>
         <StackPane fx:id="canvasPane">
             <Canvas fx:id="canvas"/>
+            <ProgressIndicator fx:id="loadingIndicator" visible="false"/>
         </StackPane>
     </center>
 

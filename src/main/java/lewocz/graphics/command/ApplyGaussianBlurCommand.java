@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplyGaussianBlurCommand implements Command {
@@ -15,6 +16,11 @@ public class ApplyGaussianBlurCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applyGaussianBlur(kernelSize, sigma);
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applyGaussianBlur(kernelSize, sigma);
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

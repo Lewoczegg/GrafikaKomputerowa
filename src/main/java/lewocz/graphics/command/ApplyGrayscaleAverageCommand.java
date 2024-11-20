@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplyGrayscaleAverageCommand implements Command {
@@ -11,6 +12,11 @@ public class ApplyGrayscaleAverageCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applyGrayscaleAverage();
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applyGrayscaleAverage();
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

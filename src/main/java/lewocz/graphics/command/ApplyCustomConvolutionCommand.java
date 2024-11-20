@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplyCustomConvolutionCommand implements Command {
@@ -13,6 +14,11 @@ public class ApplyCustomConvolutionCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applyCustomConvolution(kernel);
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applyCustomConvolution(kernel);
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

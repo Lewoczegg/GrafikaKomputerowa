@@ -444,6 +444,7 @@ public class MainView {
             }
         });
 
+        loadingIndicator.visibleProperty().bind(mainViewModel.isProcessingProperty());
         canvas.widthProperty().bind(canvasPane.widthProperty());
         canvas.heightProperty().bind(canvasPane.heightProperty());
 

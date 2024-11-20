@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplyHighPassFilterCommand implements Command {
@@ -11,6 +12,11 @@ public class ApplyHighPassFilterCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applyHighPassFilter();
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applyHighPassFilter();
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

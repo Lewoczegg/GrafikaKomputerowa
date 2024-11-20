@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplySubtractionCommand implements Command {
@@ -17,6 +18,11 @@ public class ApplySubtractionCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applySubtraction(subRed, subGreen, subBlue);
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applySubtraction(subRed, subGreen, subBlue);
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

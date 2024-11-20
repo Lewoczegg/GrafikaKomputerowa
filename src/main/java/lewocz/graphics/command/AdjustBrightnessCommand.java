@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class AdjustBrightnessCommand implements Command {
@@ -14,6 +15,11 @@ public class AdjustBrightnessCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.adjustBrightness(brightnessChange);
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.adjustBrightness(brightnessChange);
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }

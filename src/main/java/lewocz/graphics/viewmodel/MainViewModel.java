@@ -60,6 +60,7 @@ public class MainViewModel implements IMainViewModel {
 
     private double startX, startY;
     private boolean isDragging;
+    private final BooleanProperty isProcessing = new SimpleBooleanProperty(false);
 
     public MainViewModel() {
         // Initialize listeners for color properties
@@ -616,6 +617,21 @@ public class MainViewModel implements IMainViewModel {
         } catch (IOException e) {
             logger.error("Failed to save image", e);
         }
+    }
+
+    @Override
+    public BooleanProperty isProcessingProperty() {
+        return isProcessing;
+    }
+
+    @Override
+    public void setIsProcessing(boolean isProcessing) {
+        this.isProcessing.set(isProcessing);
+    }
+
+    @Override
+    public boolean isProcessing() {
+        return isProcessing.get();
     }
 
     @Override

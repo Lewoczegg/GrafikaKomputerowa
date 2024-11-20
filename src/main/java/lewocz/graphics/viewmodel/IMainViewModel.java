@@ -1,5 +1,6 @@
 package lewocz.graphics.viewmodel;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -66,4 +67,8 @@ public interface IMainViewModel {
     void applyHighPassFilter();
     void applyGaussianBlur(int kernelSize, double sigma);
     void applyCustomConvolution(double[][] kernel);
+
+    BooleanProperty isProcessingProperty();
+    void setIsProcessing(boolean isProcessing);
+    boolean isProcessing();
 }

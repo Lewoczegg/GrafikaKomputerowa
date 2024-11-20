@@ -1,5 +1,6 @@
 package lewocz.graphics.command;
 
+import javafx.application.Platform;
 import lewocz.graphics.viewmodel.IMainViewModel;
 
 public class ApplyAdditionCommand implements Command {
@@ -18,6 +19,11 @@ public class ApplyAdditionCommand implements Command {
 
     @Override
     public void execute() {
-        mainViewModel.applyAddition(addRed, addGreen, addBlue);
+        Platform.runLater(() -> mainViewModel.setIsProcessing(true));
+        try {
+            mainViewModel.applyAddition(addRed, addGreen, addBlue);
+        } finally {
+            Platform.runLater(() -> mainViewModel.setIsProcessing(false));
+        }
     }
 }
