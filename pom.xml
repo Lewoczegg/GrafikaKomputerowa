@@ -27,7 +27,12 @@
 		<url/>
 	</scm>
 	<properties>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>21</java.version>
+		<javafx.version>21.0.5</javafx.version>
+		<javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -45,6 +50,21 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>${javafx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-fxml</artifactId>
+			<version>${javafx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-graphics</artifactId>
+			<version>${javafx.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -59,6 +79,14 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.openjfx</groupId>
+				<artifactId>javafx-maven-plugin</artifactId>
+				<version>${javafx.maven.plugin.version}</version>
+				<configuration>
+					<mainClass>lewocz.graphics.Main</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>
