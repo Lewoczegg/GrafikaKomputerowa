@@ -270,7 +270,7 @@ public class MainView {
 
     private void onAdjustBrightness() {
         try {
-            double brightnessChange = Double.parseDouble(brightnessField.getText());
+            double brightnessChange = Double.parseDouble(brightnessField.getText().replace(',', '.'));
             Command command = new AdjustBrightnessCommand(mainViewModel, brightnessChange);
             eventQueue.enqueue(command);
         } catch (NumberFormatException e) {
