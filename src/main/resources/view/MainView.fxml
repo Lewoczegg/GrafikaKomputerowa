@@ -301,7 +301,44 @@
                                             </VBox>
                                             <Button fx:id="applyMeanIterativeSelectionButton" text="Apply Mean Iterative Selection" />
                                         </VBox>
+
                                     </TitledPane>
+                                    <TitledPane text="Otsu Thresholding" expanded="false">
+                                        <VBox spacing="5">
+                                            <Button fx:id="applyOtsuThresholdingButton" text="Apply Otsu Thresholding" />
+                                        </VBox>
+                                    </TitledPane>
+                                    <TitledPane text="Niblack Thresholding" expanded="false">
+                                        <VBox spacing="5">
+                                            <HBox spacing="5">
+                                                <Label text="Window Size (odd integer):" />
+                                                <TextField fx:id="niblackWindowSizeField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="k value:" />
+                                                <TextField fx:id="niblackKField" prefWidth="50" />
+                                            </HBox>
+                                            <Button fx:id="applyNiblackThresholdingButton" text="Apply Niblack Thresholding" />
+                                        </VBox>
+                                    </TitledPane>
+                                    <TitledPane text="Sauvola Thresholding" expanded="false">
+                                        <VBox spacing="5">
+                                            <HBox spacing="5">
+                                                <Label text="Window Size (odd integer):" />
+                                                <TextField fx:id="sauvolaWindowSizeField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="k value:" />
+                                                <TextField fx:id="sauvolaKField" prefWidth="50" />
+                                            </HBox>
+                                            <HBox spacing="5">
+                                                <Label text="r value:" />
+                                                <TextField fx:id="sauvolaRField" prefWidth="50" />
+                                            </HBox>
+                                            <Button fx:id="applySauvolaThresholdingButton" text="Apply Sauvola Thresholding" />
+                                        </VBox>
+                                    </TitledPane>
+
                                 </VBox>
                             </ScrollPane>
                         </content>

@@ -205,6 +205,25 @@ public class MainView {
     @FXML
     private Button applyMeanIterativeSelectionButton;
 
+    @FXML
+    private Button applyOtsuThresholdingButton;
+
+    @FXML
+    private TextField niblackWindowSizeField;
+    @FXML
+    private TextField niblackKField;
+    @FXML
+    private Button applyNiblackThresholdingButton;
+
+    @FXML
+    private TextField sauvolaWindowSizeField;
+    @FXML
+    private TextField sauvolaKField;
+    @FXML
+    private TextField sauvolaRField;
+    @FXML
+    private Button applySauvolaThresholdingButton;
+
     private Group root3D;
     private double mousePosX, mousePosY;
     private double mouseOldX, mouseOldY;
@@ -439,6 +458,46 @@ public class MainView {
         eventQueue.enqueue(command);
     }
 
+    private void onApplyOtsuThresholding() {
+        Command command = new ApplyOtsuThresholdingCommand(mainViewModel);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplyNiblackThresholding() {
+        try {
+            int windowSize = Integer.parseInt(niblackWindowSizeField.getText());
+            double k = Double.parseDouble(niblackKField.getText().replace(',', '.'));
+
+            if (windowSize % 2 == 0 || windowSize <= 0) {
+                showAlert("Invalid Window Size", "Window size must be a positive odd integer.");
+                return;
+            }
+
+            Command command = new ApplyNiblackThresholdingCommand(mainViewModel, windowSize, k);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter valid numbers for window size and k.");
+        }
+    }
+
+    private void onApplySauvolaThresholding() {
+        try {
+            int windowSize = Integer.parseInt(sauvolaWindowSizeField.getText());
+            double k = Double.parseDouble(sauvolaKField.getText().replace(',', '.'));
+            double r = Double.parseDouble(sauvolaRField.getText().replace(',', '.'));
+
+            if (windowSize % 2 == 0 || windowSize <= 0) {
+                showAlert("Invalid Window Size", "Window size must be a positive odd integer.");
+                return;
+            }
+
+            Command command = new ApplySauvolaThresholdingCommand(mainViewModel, windowSize, k, r);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter valid numbers for window size, k, and r.");
+        }
+    }
+
     private void setUp3DScene() {
         root3D = new Group();
 
@@ -534,6 +593,10 @@ public class MainView {
         applyManualThresholdingButton.setOnAction(e -> onApplyManualThresholding());
         applyPercentBlackSelectionButton.setOnAction(e -> onApplyPercentBlackSelection());
         applyMeanIterativeSelectionButton.setOnAction(e -> onApplyMeanIterativeSelection());
+
+        applyOtsuThresholdingButton.setOnAction(e -> onApplyOtsuThresholding());
+        applyNiblackThresholdingButton.setOnAction(e -> onApplyNiblackThresholding());
+        applySauvolaThresholdingButton.setOnAction(e -> onApplySauvolaThresholding());
     }
 
     private void bindColorProperties() {

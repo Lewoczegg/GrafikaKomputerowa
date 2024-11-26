@@ -72,6 +72,9 @@ public interface IMainViewModel {
     void applyManualThresholding(int threshold);
     void applyPercentBlackSelection(double percentBlack);
     void applyMeanIterativeSelection();
+    void applyOtsuThresholding();
+    void applyNiblackThresholding(int windowSize, double k);
+    void applySauvolaThresholding(int windowSize, double k, double r);
 
     BooleanProperty isProcessingProperty();
     void setIsProcessing(boolean isProcessing);

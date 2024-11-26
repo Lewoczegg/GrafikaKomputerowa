@@ -487,4 +487,158 @@ public class ImageProcessor {
         // Apply thresholding
         return manualThresholding(image, (int) threshold);
     }
+
+    public static WritableImage otsuThresholding(WritableImage image) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        PixelReader reader = image.getPixelReader();
+
+        int[] histogram = new int[256];
+        int totalPixels = width * height;
+
+        // Compute histogram
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int intensity = (int) (reader.getColor(x, y).getBrightness() * 255);
+                histogram[intensity]++;
+            }
+        }
+
+        // Total sum of pixel intensities
+        double sumTotal = 0;
+        for (int t = 0; t < 256; t++) {
+            sumTotal += t * histogram[t];
+        }
+
+        double sumBackground = 0;
+        int weightBackground = 0;
+        int weightForeground = 0;
+
+        double maxVariance = 0;
+        int threshold = 0;
+
+        for (int t = 0; t < 256; t++) {
+            weightBackground += histogram[t];
+            if (weightBackground == 0) continue;
+
+            weightForeground = totalPixels - weightBackground;
+            if (weightForeground == 0) break;
+
+            sumBackground += t * histogram[t];
+
+            double meanBackground = sumBackground / weightBackground;
+            double meanForeground = (sumTotal - sumBackground) / weightForeground;
+
+            double betweenClassVariance = weightBackground * weightForeground * Math.pow(meanBackground - meanForeground, 2);
+
+            if (betweenClassVariance > maxVariance) {
+                maxVariance = betweenClassVariance;
+                threshold = t;
+            }
+        }
+
+        // Apply thresholding
+        return manualThresholding(image, threshold);
+    }
+
+    public static WritableImage niblackThresholding(WritableImage image, int windowSize, double k) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        PixelReader reader = image.getPixelReader();
+        WritableImage result = new WritableImage(width, height);
+        PixelWriter writer = result.getPixelWriter();
+
+        int halfWindow = windowSize / 2;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                double sum = 0;
+                double sumSq = 0;
+                int count = 0;
+
+                // Compute mean and standard deviation in the window
+                for (int wy = -halfWindow; wy <= halfWindow; wy++) {
+                    for (int wx = -halfWindow; wx <= halfWindow; wx++) {
+                        int nx = x + wx;
+                        int ny = y + wy;
+
+                        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                            double intensity = reader.getColor(nx, ny).getBrightness() * 255;
+                            sum += intensity;
+                            sumSq += intensity * intensity;
+                            count++;
+                        }
+                    }
+                }
+
+                double mean = sum / count;
+                double variance = (sumSq / count) - (mean * mean);
+                double stdDev = Math.sqrt(variance);
+
+                double threshold = mean + k * stdDev;
+
+                double pixelIntensity = reader.getColor(x, y).getBrightness() * 255;
+
+                if (pixelIntensity < threshold) {
+                    writer.setColor(x, y, Color.BLACK);
+                } else {
+                    writer.setColor(x, y, Color.WHITE);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static WritableImage sauvolaThresholding(WritableImage image, int windowSize, double k, double r) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        PixelReader reader = image.getPixelReader();
+        WritableImage result = new WritableImage(width, height);
+        PixelWriter writer = result.getPixelWriter();
+
+        int halfWindow = windowSize / 2;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                double sum = 0;
+                double sumSq = 0;
+                int count = 0;
+
+                // Compute mean and standard deviation in the window
+                for (int wy = -halfWindow; wy <= halfWindow; wy++) {
+                    for (int wx = -halfWindow; wx <= halfWindow; wx++) {
+                        int nx = x + wx;
+                        int ny = y + wy;
+
+                        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                            double intensity = reader.getColor(nx, ny).getBrightness() * 255;
+                            sum += intensity;
+                            sumSq += intensity * intensity;
+                            count++;
+                        }
+                    }
+                }
+
+                double mean = sum / count;
+                double variance = (sumSq / count) - (mean * mean);
+                double stdDev = Math.sqrt(variance);
+
+                double threshold = mean * (1 + k * ((stdDev / r) - 1));
+
+                double pixelIntensity = reader.getColor(x, y).getBrightness() * 255;
+
+                if (pixelIntensity < threshold) {
+                    writer.setColor(x, y, Color.BLACK);
+                } else {
+                    writer.setColor(x, y, Color.WHITE);
+                }
+            }
+        }
+
+        return result;
+    }
 }

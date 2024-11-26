@@ -596,6 +596,33 @@ public class MainViewModel implements IMainViewModel {
         }
     }
 
+    @Override
+    public void applyOtsuThresholding() {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.otsuThresholding(currentImageModel.getImage());
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyNiblackThresholding(int windowSize, double k) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.niblackThresholding(currentImageModel.getImage(), windowSize, k);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applySauvolaThresholding(int windowSize, double k, double r) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.sauvolaThresholding(currentImageModel.getImage(), windowSize, k, r);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
     // Load and Save Methods
 
     @Override
