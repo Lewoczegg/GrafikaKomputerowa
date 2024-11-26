@@ -192,6 +192,19 @@ public class MainView {
     @FXML
     private Button applyHistogramEqualizationButton;
 
+    @FXML
+    private TextField manualThresholdField;
+    @FXML
+    private Button applyManualThresholdingButton;
+
+    @FXML
+    private TextField percentBlackField;
+    @FXML
+    private Button applyPercentBlackSelectionButton;
+
+    @FXML
+    private Button applyMeanIterativeSelectionButton;
+
     private Group root3D;
     private double mousePosX, mousePosY;
     private double mouseOldX, mouseOldY;
@@ -393,6 +406,39 @@ public class MainView {
         eventQueue.enqueue(command);
     }
 
+    private void onApplyManualThresholding() {
+        try {
+            int threshold = Integer.parseInt(manualThresholdField.getText());
+            if (threshold < 0 || threshold > 255) {
+                showAlert("Invalid Threshold", "Threshold must be between 0 and 255.");
+                return;
+            }
+            Command command = new ApplyManualThresholdingCommand(mainViewModel, threshold);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter a valid integer for threshold.");
+        }
+    }
+
+    private void onApplyPercentBlackSelection() {
+        try {
+            double percentBlack = Double.parseDouble(percentBlackField.getText().replace(',', '.'));
+            if (percentBlack < 0 || percentBlack > 100) {
+                showAlert("Invalid Percentage", "Percentage must be between 0 and 100.");
+                return;
+            }
+            Command command = new ApplyPercentBlackSelectionCommand(mainViewModel, percentBlack);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter a valid number for percent black.");
+        }
+    }
+
+    private void onApplyMeanIterativeSelection() {
+        Command command = new ApplyMeanIterativeSelectionCommand(mainViewModel);
+        eventQueue.enqueue(command);
+    }
+
     private void setUp3DScene() {
         root3D = new Group();
 
@@ -484,6 +530,10 @@ public class MainView {
 
         applyHistogramStretchingButton.setOnAction(e -> onApplyHistogramStretching());
         applyHistogramEqualizationButton.setOnAction(e -> onApplyHistogramEqualization());
+
+        applyManualThresholdingButton.setOnAction(e -> onApplyManualThresholding());
+        applyPercentBlackSelectionButton.setOnAction(e -> onApplyPercentBlackSelection());
+        applyMeanIterativeSelectionButton.setOnAction(e -> onApplyMeanIterativeSelection());
     }
 
     private void bindColorProperties() {

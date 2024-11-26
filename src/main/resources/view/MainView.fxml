@@ -283,6 +283,25 @@
                                             <Button fx:id="applyHistogramEqualizationButton" text="Histogram Equalization" />
                                         </VBox>
                                     </TitledPane>
+                                    <TitledPane text="Binarization" expanded="false">
+                                        <VBox spacing="5">
+                                            <VBox spacing="5">
+                                                <HBox spacing="5">
+                                                    <Label text="Threshold (0-255):" />
+                                                    <TextField fx:id="manualThresholdField" prefWidth="50" />
+                                                </HBox>
+                                                <Button fx:id="applyManualThresholdingButton" text="Apply Manual Thresholding" />
+                                            </VBox>
+                                            <VBox spacing="5">
+                                                <HBox spacing="5">
+                                                    <Label text="Percent Black (0-100):" />
+                                                    <TextField fx:id="percentBlackField" prefWidth="50" />
+                                                </HBox>
+                                                <Button fx:id="applyPercentBlackSelectionButton" text="Apply Percent Black Selection" />
+                                            </VBox>
+                                            <Button fx:id="applyMeanIterativeSelectionButton" text="Apply Mean Iterative Selection" />
+                                        </VBox>
+                                    </TitledPane>
                                 </VBox>
                             </ScrollPane>
                         </content>

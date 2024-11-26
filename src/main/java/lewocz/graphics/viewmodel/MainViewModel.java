@@ -569,6 +569,33 @@ public class MainViewModel implements IMainViewModel {
         }
     }
 
+    @Override
+    public void applyManualThresholding(int threshold) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.manualThresholding(currentImageModel.getImage(), threshold);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyPercentBlackSelection(double percentBlack) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.percentBlackSelection(currentImageModel.getImage(), percentBlack);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyMeanIterativeSelection() {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.meanIterativeSelection(currentImageModel.getImage());
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
     // Load and Save Methods
 
     @Override

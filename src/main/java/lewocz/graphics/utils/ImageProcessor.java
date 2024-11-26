@@ -380,4 +380,111 @@ public class ImageProcessor {
 
         return result;
     }
+
+    public static WritableImage manualThresholding(WritableImage image, int threshold) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        PixelReader reader = image.getPixelReader();
+        WritableImage result = new WritableImage(width, height);
+        PixelWriter writer = result.getPixelWriter();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color color = reader.getColor(x, y);
+                double intensity = color.getBrightness() * 255;
+                if (intensity < threshold) {
+                    writer.setColor(x, y, Color.BLACK);
+                } else {
+                    writer.setColor(x, y, Color.WHITE);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static WritableImage percentBlackSelection(WritableImage image, double percentBlack) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+        int numPixels = width * height;
+        int desiredBlackPixels = (int) (numPixels * (percentBlack / 100.0));
+
+        PixelReader reader = image.getPixelReader();
+
+        // Create a histogram of intensities
+        int[] histogram = new int[256];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color color = reader.getColor(x, y);
+                int intensity = (int) (color.getBrightness() * 255);
+                histogram[intensity]++;
+            }
+        }
+
+        // Find the threshold that results in the desired number of black pixels
+        int cumulativeSum = 0;
+        int threshold = 0;
+        for (int i = 0; i < 256; i++) {
+            cumulativeSum += histogram[i];
+            if (cumulativeSum >= desiredBlackPixels) {
+                threshold = i;
+                break;
+            }
+        }
+
+        // Apply thresholding
+        return manualThresholding(image, threshold);
+    }
+
+    public static WritableImage meanIterativeSelection(WritableImage image) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        PixelReader reader = image.getPixelReader();
+
+        // Initialize threshold with the mean intensity of the image
+        double totalIntensity = 0;
+        int numPixels = width * height;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color color = reader.getColor(x, y);
+                totalIntensity += color.getBrightness() * 255;
+            }
+        }
+
+        double threshold = totalIntensity / numPixels;
+        double previousThreshold;
+        double epsilon = 0.5; // Convergence criterion
+
+        do {
+            previousThreshold = threshold;
+            double sumForeground = 0;
+            int countForeground = 0;
+            double sumBackground = 0;
+            int countBackground = 0;
+
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    double intensity = reader.getColor(x, y).getBrightness() * 255;
+                    if (intensity > threshold) {
+                        sumForeground += intensity;
+                        countForeground++;
+                    } else {
+                        sumBackground += intensity;
+                        countBackground++;
+                    }
+                }
+            }
+
+            double meanForeground = countForeground > 0 ? sumForeground / countForeground : 0;
+            double meanBackground = countBackground > 0 ? sumBackground / countBackground : 0;
+
+            threshold = (meanForeground + meanBackground) / 2;
+
+        } while (Math.abs(threshold - previousThreshold) >= epsilon);
+
+        // Apply thresholding
+        return manualThresholding(image, (int) threshold);
+    }
 }

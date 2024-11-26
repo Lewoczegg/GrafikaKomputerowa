@@ -69,6 +69,9 @@ public interface IMainViewModel {
     void applyCustomConvolution(double[][] kernel);
     void applyHistogramStretching();
     void applyHistogramEqualization();
+    void applyManualThresholding(int threshold);
+    void applyPercentBlackSelection(double percentBlack);
+    void applyMeanIterativeSelection();
 
     BooleanProperty isProcessingProperty();
     void setIsProcessing(boolean isProcessing);
