@@ -277,6 +277,12 @@
                                             <Button fx:id="applyCustomConvolutionButton" text="Apply Custom Convolution" />
                                         </VBox>
                                     </TitledPane>
+                                    <TitledPane text="Histogram Operations" expanded="false">
+                                        <VBox spacing="5">
+                                            <Button fx:id="applyHistogramStretchingButton" text="Histogram Stretching" />
+                                            <Button fx:id="applyHistogramEqualizationButton" text="Histogram Equalization" />
+                                        </VBox>
+                                    </TitledPane>
                                 </VBox>
                             </ScrollPane>
                         </content>

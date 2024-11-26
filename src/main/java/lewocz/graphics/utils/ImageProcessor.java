@@ -290,4 +290,94 @@ public class ImageProcessor {
 
         return outputImage;
     }
+
+    public static WritableImage histogramStretching(WritableImage image) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        PixelReader reader = image.getPixelReader();
+        WritableImage result = new WritableImage(width, height);
+        PixelWriter writer = result.getPixelWriter();
+
+        double minIntensity = 1.0;
+        double maxIntensity = 0.0;
+
+        // Find min and max intensity values
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color color = reader.getColor(x, y);
+                double intensity = color.getBrightness();
+                if (intensity < minIntensity) minIntensity = intensity;
+                if (intensity > maxIntensity) maxIntensity = intensity;
+            }
+        }
+
+        double intensityRange = maxIntensity - minIntensity;
+        if (intensityRange == 0) {
+            // Avoid division by zero if the image has constant intensity
+            return image;
+        }
+
+        // Apply histogram stretching
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color color = reader.getColor(x, y);
+                double intensity = color.getBrightness();
+                double stretchedIntensity = (intensity - minIntensity) / intensityRange;
+                Color newColor = Color.gray(stretchedIntensity);
+                writer.setColor(x, y, newColor);
+            }
+        }
+
+        return result;
+    }
+
+    public static WritableImage histogramEqualization(WritableImage image) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+        int numPixels = width * height;
+
+        PixelReader reader = image.getPixelReader();
+        WritableImage result = new WritableImage(width, height);
+        PixelWriter writer = result.getPixelWriter();
+
+        // Assuming a grayscale image
+        int[] histogram = new int[256];
+        double[] cdf = new double[256];
+
+        // Compute histogram
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color color = reader.getColor(x, y);
+                int intensity = (int) (color.getBrightness() * 255);
+                histogram[intensity]++;
+            }
+        }
+
+        // Compute cumulative distribution function (CDF)
+        cdf[0] = histogram[0] / (double) numPixels;
+        for (int i = 1; i < 256; i++) {
+            cdf[i] = cdf[i - 1] + histogram[i] / (double) numPixels;
+        }
+
+        // Ensure the last value of CDF is exactly 1.0 to prevent floating-point errors
+        cdf[255] = 1.0;
+
+        // Apply histogram equalization
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color color = reader.getColor(x, y);
+                int intensity = (int) (color.getBrightness() * 255);
+                double equalizedIntensity = cdf[intensity];
+
+                // Clamp the intensity to [0.0, 1.0]
+                equalizedIntensity = Math.min(equalizedIntensity, 1.0);
+
+                Color newColor = Color.gray(equalizedIntensity);
+                writer.setColor(x, y, newColor);
+            }
+        }
+
+        return result;
+    }
 }

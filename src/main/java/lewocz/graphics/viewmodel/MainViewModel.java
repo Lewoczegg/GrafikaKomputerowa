@@ -551,10 +551,19 @@ public class MainViewModel implements IMainViewModel {
         }
     }
 
-    // Improving the Apple Image
-    public void improveAppleImage() {
+    @Override
+    public void applyHistogramStretching() {
         if (currentImageModel != null) {
-            WritableImage result = ImageProcessor.applyMedianFilter(currentImageModel.getImage());
+            WritableImage result = ImageProcessor.histogramStretching(currentImageModel.getImage());
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyHistogramEqualization() {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.histogramEqualization(currentImageModel.getImage());
             currentImageModel.setImage(result);
             requestRedraw();
         }

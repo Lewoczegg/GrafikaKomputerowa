@@ -67,6 +67,8 @@ public interface IMainViewModel {
     void applyHighPassFilter();
     void applyGaussianBlur(int kernelSize, double sigma);
     void applyCustomConvolution(double[][] kernel);
+    void applyHistogramStretching();
+    void applyHistogramEqualization();
 
     BooleanProperty isProcessingProperty();
     void setIsProcessing(boolean isProcessing);

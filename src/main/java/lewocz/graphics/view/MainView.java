@@ -187,6 +187,11 @@ public class MainView {
     @FXML
     private ProgressIndicator loadingIndicator;
 
+    @FXML
+    private Button applyHistogramStretchingButton;
+    @FXML
+    private Button applyHistogramEqualizationButton;
+
     private Group root3D;
     private double mousePosX, mousePosY;
     private double mouseOldX, mouseOldY;
@@ -378,6 +383,16 @@ public class MainView {
         }
     }
 
+    private void onApplyHistogramStretching() {
+        Command command = new ApplyHistogramStretchingCommand(mainViewModel);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplyHistogramEqualization() {
+        Command command = new ApplyHistogramEqualizationCommand(mainViewModel);
+        eventQueue.enqueue(command);
+    }
+
     private void setUp3DScene() {
         root3D = new Group();
 
@@ -466,6 +481,9 @@ public class MainView {
         applyHighPassFilterButton.setOnAction(e -> onApplyHighPassFilter());
         applyGaussianBlurButton.setOnAction(e -> onApplyGaussianBlur());
         applyCustomConvolutionButton.setOnAction(e -> onApplyCustomConvolution());
+
+        applyHistogramStretchingButton.setOnAction(e -> onApplyHistogramStretching());
+        applyHistogramEqualizationButton.setOnAction(e -> onApplyHistogramEqualization());
     }
 
     private void bindColorProperties() {
