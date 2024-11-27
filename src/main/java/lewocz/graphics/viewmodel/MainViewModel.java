@@ -623,6 +623,51 @@ public class MainViewModel implements IMainViewModel {
         }
     }
 
+    @Override
+    public void applyDilation(boolean[][] structuringElement) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.dilation(currentImageModel.getImage(), structuringElement);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyErosion(boolean[][] structuringElement) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.erosion(currentImageModel.getImage(), structuringElement);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyOpening(boolean[][] structuringElement) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.opening(currentImageModel.getImage(), structuringElement);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyClosing(boolean[][] structuringElement) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.closing(currentImageModel.getImage(), structuringElement);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
+    @Override
+    public void applyHitOrMiss(boolean[][] hitMask, boolean[][] missMask) {
+        if (currentImageModel != null) {
+            WritableImage result = ImageProcessor.hitOrMiss(currentImageModel.getImage(), hitMask, missMask);
+            currentImageModel.setImage(result);
+            requestRedraw();
+        }
+    }
+
     // Load and Save Methods
 
     @Override

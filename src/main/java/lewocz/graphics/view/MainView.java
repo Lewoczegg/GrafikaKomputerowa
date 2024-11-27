@@ -216,6 +216,21 @@ public class MainView {
     private Button applyNiblackThresholdingButton;
 
     @FXML
+    private Button applyDilationButton;
+    @FXML
+    private Button applyErosionButton;
+    @FXML
+    private Button applyOpeningButton;
+    @FXML
+    private Button applyClosingButton;
+    @FXML
+    private Button applyHitOrMissButton;
+    @FXML
+    private TextArea hitMaskArea;
+    @FXML
+    private TextArea missMaskArea;
+
+    @FXML
     private TextField sauvolaWindowSizeField;
     @FXML
     private TextField sauvolaKField;
@@ -498,6 +513,76 @@ public class MainView {
         }
     }
 
+    private void onApplyDilation() {
+        boolean[][] structuringElement = getDefaultStructuringElement();
+        Command command = new ApplyDilationCommand(mainViewModel, structuringElement);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplyErosion() {
+        boolean[][] structuringElement = getDefaultStructuringElement();
+        Command command = new ApplyErosionCommand(mainViewModel, structuringElement);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplyOpening() {
+        boolean[][] structuringElement = getDefaultStructuringElement();
+        Command command = new ApplyOpeningCommand(mainViewModel, structuringElement);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplyClosing() {
+        boolean[][] structuringElement = getDefaultStructuringElement();
+        Command command = new ApplyClosingCommand(mainViewModel, structuringElement);
+        eventQueue.enqueue(command);
+    }
+
+    private void onApplyHitOrMiss() {
+        try {
+            boolean[][] hitMask = parseMask(hitMaskArea.getText());
+            boolean[][] missMask = parseMask(missMaskArea.getText());
+            Command command = new ApplyHitOrMissCommand(mainViewModel, hitMask, missMask);
+            eventQueue.enqueue(command);
+        } catch (IllegalArgumentException e) {
+            showAlert("Invalid Mask", e.getMessage());
+        }
+    }
+
+    private boolean[][] getDefaultStructuringElement() {
+        // Default 3x3 square structuring element
+        return new boolean[][] {
+                { true, true, true },
+                { true, true, true },
+                { true, true, true }
+        };
+    }
+
+    private boolean[][] parseMask(String maskText) throws IllegalArgumentException {
+        String[] lines = maskText.trim().split("\\n");
+        int numRows = lines.length;
+        int numCols = lines[0].trim().split("\\s+").length;
+
+        boolean[][] mask = new boolean[numRows][numCols];
+
+        for (int y = 0; y < numRows; y++) {
+            String[] tokens = lines[y].trim().split("\\s+");
+            if (tokens.length != numCols) {
+                throw new IllegalArgumentException("All rows must have the same number of elements.");
+            }
+            for (int x = 0; x < numCols; x++) {
+                String token = tokens[x];
+                if (token.equals("1")) {
+                    mask[y][x] = true;
+                } else if (token.equals("0")) {
+                    mask[y][x] = false;
+                } else {
+                    throw new IllegalArgumentException("Mask elements must be 0 or 1.");
+                }
+            }
+        }
+        return mask;
+    }
+
     private void setUp3DScene() {
         root3D = new Group();
 
@@ -597,6 +682,12 @@ public class MainView {
         applyOtsuThresholdingButton.setOnAction(e -> onApplyOtsuThresholding());
         applyNiblackThresholdingButton.setOnAction(e -> onApplyNiblackThresholding());
         applySauvolaThresholdingButton.setOnAction(e -> onApplySauvolaThresholding());
+
+        applyDilationButton.setOnAction(e -> onApplyDilation());
+        applyErosionButton.setOnAction(e -> onApplyErosion());
+        applyOpeningButton.setOnAction(e -> onApplyOpening());
+        applyClosingButton.setOnAction(e -> onApplyClosing());
+        applyHitOrMissButton.setOnAction(e -> onApplyHitOrMiss());
     }
 
     private void bindColorProperties() {

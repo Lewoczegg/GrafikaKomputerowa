@@ -339,6 +339,30 @@
                                         </VBox>
                                     </TitledPane>
 
+                                    <TitledPane text="Morphological Operations" expanded="false">
+                                        <VBox spacing="5">
+                                            <!-- Dilation and Erosion -->
+                                            <HBox spacing="5">
+                                                <Button fx:id="applyDilationButton" text="Apply Dilation" />
+                                                <Button fx:id="applyErosionButton" text="Apply Erosion" />
+                                            </HBox>
+                                            <!-- Opening and Closing -->
+                                            <HBox spacing="5">
+                                                <Button fx:id="applyOpeningButton" text="Apply Opening" />
+                                                <Button fx:id="applyClosingButton" text="Apply Closing" />
+                                            </HBox>
+                                            <!-- Hit-or-Miss Transform -->
+                                            <TitledPane text="Hit-or-Miss Transform" expanded="false">
+                                                <VBox spacing="5">
+                                                    <Label text="Hit Mask (use 0 and 1):" />
+                                                    <TextArea fx:id="hitMaskArea" prefRowCount="3" prefColumnCount="10" />
+                                                    <Label text="Miss Mask (use 0 and 1):" />
+                                                    <TextArea fx:id="missMaskArea" prefRowCount="3" prefColumnCount="10" />
+                                                    <Button fx:id="applyHitOrMissButton" text="Apply Hit-or-Miss" />
+                                                </VBox>
+                                            </TitledPane>
+                                        </VBox>
+                                    </TitledPane>
                                 </VBox>
                             </ScrollPane>
                         </content>

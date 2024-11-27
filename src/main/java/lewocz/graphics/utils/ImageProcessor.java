@@ -641,4 +641,170 @@ public class ImageProcessor {
 
         return result;
     }
+
+    public static WritableImage dilation(WritableImage image, boolean[][] structuringElement) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        WritableImage outputImage = new WritableImage(width, height);
+        PixelReader pixelReader = image.getPixelReader();
+        PixelWriter pixelWriter = outputImage.getPixelWriter();
+
+        int seWidth = structuringElement[0].length;
+        int seHeight = structuringElement.length;
+
+        int xOrigin = seWidth / 2;
+        int yOrigin = seHeight / 2;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                double maxR = 0.0;
+                double maxG = 0.0;
+                double maxB = 0.0;
+                double maxA = 0.0;
+
+                for (int j = 0; j < seHeight; j++) {
+                    for (int i = 0; i < seWidth; i++) {
+                        if (structuringElement[j][i]) {
+                            int offsetX = i - xOrigin;
+                            int offsetY = j - yOrigin;
+
+                            int imageX = x - offsetX;
+                            int imageY = y - offsetY;
+
+                            if (imageX >= 0 && imageX < width && imageY >= 0 && imageY < height) {
+                                Color color = pixelReader.getColor(imageX, imageY);
+
+                                if (color.getRed() > maxR) maxR = color.getRed();
+                                if (color.getGreen() > maxG) maxG = color.getGreen();
+                                if (color.getBlue() > maxB) maxB = color.getBlue();
+                                if (color.getOpacity() > maxA) maxA = color.getOpacity();
+                            }
+                        }
+                    }
+                }
+
+                Color maxColor = new Color(maxR, maxG, maxB, maxA);
+                pixelWriter.setColor(x, y, maxColor);
+            }
+        }
+
+        return outputImage;
+    }
+
+    public static WritableImage erosion(WritableImage image, boolean[][] structuringElement) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        WritableImage outputImage = new WritableImage(width, height);
+        PixelReader pixelReader = image.getPixelReader();
+        PixelWriter pixelWriter = outputImage.getPixelWriter();
+
+        int seWidth = structuringElement[0].length;
+        int seHeight = structuringElement.length;
+
+        int xOrigin = seWidth / 2;
+        int yOrigin = seHeight / 2;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                double minR = 1.0;
+                double minG = 1.0;
+                double minB = 1.0;
+                double minA = 1.0;
+
+                for (int j = 0; j < seHeight; j++) {
+                    for (int i = 0; i < seWidth; i++) {
+                        if (structuringElement[j][i]) {
+                            int offsetX = i - xOrigin;
+                            int offsetY = j - yOrigin;
+
+                            int imageX = x + offsetX;
+                            int imageY = y + offsetY;
+
+                            if (imageX >= 0 && imageX < width && imageY >= 0 && imageY < height) {
+                                Color color = pixelReader.getColor(imageX, imageY);
+
+                                if (color.getRed() < minR) minR = color.getRed();
+                                if (color.getGreen() < minG) minG = color.getGreen();
+                                if (color.getBlue() < minB) minB = color.getBlue();
+                                if (color.getOpacity() < minA) minA = color.getOpacity();
+                            } else {
+                                // If any of the pixels are outside the image bounds,
+                                // according to morphological erosion, we consider the
+                                // background (which can be considered as maximum intensity).
+                                // Therefore, we can set min values to 0 to reflect erosion at the edges.
+                                minR = 0.0;
+                                minG = 0.0;
+                                minB = 0.0;
+                                minA = 0.0;
+                            }
+                        }
+                    }
+                }
+
+                Color minColor = new Color(minR, minG, minB, minA);
+                pixelWriter.setColor(x, y, minColor);
+            }
+        }
+
+        return outputImage;
+    }
+
+    public static WritableImage opening(WritableImage image, boolean[][] structuringElement) {
+        WritableImage eroded = erosion(image, structuringElement);
+        return dilation(eroded, structuringElement);
+    }
+
+    public static WritableImage closing(WritableImage image, boolean[][] structuringElement) {
+        WritableImage dilated = dilation(image, structuringElement);
+        return erosion(dilated, structuringElement);
+    }
+
+    public static WritableImage hitOrMiss(WritableImage image, boolean[][] hitMask, boolean[][] missMask) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        PixelReader reader = image.getPixelReader();
+        WritableImage result = new WritableImage(width, height);
+        PixelWriter writer = result.getPixelWriter();
+
+        int maskWidth = hitMask[0].length;
+        int maskHeight = hitMask.length;
+        int originX = maskWidth / 2;
+        int originY = maskHeight / 2;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                boolean hit = true;
+                for (int my = 0; my < maskHeight; my++) {
+                    for (int mx = 0; mx < maskWidth; mx++) {
+                        int ix = x + mx - originX;
+                        int iy = y + my - originY;
+
+                        if (ix >= 0 && ix < width && iy >= 0 && iy < height) {
+                            Color color = reader.getColor(ix, iy);
+                            if (hitMask[my][mx] && !color.equals(Color.BLACK)) {
+                                hit = false;
+                                break;
+                            }
+                            if (missMask[my][mx] && !color.equals(Color.WHITE)) {
+                                hit = false;
+                                break;
+                            }
+                        } else {
+                            if (hitMask[my][mx] || missMask[my][mx]) {
+                                hit = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (!hit) break;
+                }
+                writer.setColor(x, y, hit ? Color.BLACK : Color.WHITE);
+            }
+        }
+
+        return result;
+    }
 }

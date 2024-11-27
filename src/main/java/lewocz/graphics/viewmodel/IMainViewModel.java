@@ -75,6 +75,11 @@ public interface IMainViewModel {
     void applyOtsuThresholding();
     void applyNiblackThresholding(int windowSize, double k);
     void applySauvolaThresholding(int windowSize, double k, double r);
+    void applyDilation(boolean[][] structuringElement);
+    void applyErosion(boolean[][] structuringElement);
+    void applyOpening(boolean[][] structuringElement);
+    void applyClosing(boolean[][] structuringElement);
+    void applyHitOrMiss(boolean[][] hitMask, boolean[][] missMask);
 
     BooleanProperty isProcessingProperty();
     void setIsProcessing(boolean isProcessing);
