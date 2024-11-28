@@ -1,12 +1,19 @@
 package lewocz.graphics.view;
 
+import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -15,17 +22,17 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
+import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import lewocz.graphics.command.*;
 import lewocz.graphics.event.EventQueue;
+import lewocz.graphics.model.BezierCurveModel;
 import lewocz.graphics.model.PNMFormat;
 import lewocz.graphics.model.ShapeModel;
 import lewocz.graphics.model.Tool;
 import lewocz.graphics.view.components.DoubleTextField;
 import lewocz.graphics.view.components.IntegerTextField;
 import lewocz.graphics.viewmodel.IMainViewModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -33,7 +40,6 @@ import java.util.Optional;
 
 @Component
 public class MainView {
-    private static final Logger log = LoggerFactory.getLogger(MainView.class);
     @FXML
     private ToggleGroup toolToggleGroup;
     @FXML
@@ -48,6 +54,8 @@ public class MainView {
     private ToggleButton lineToolButton;
     @FXML
     private ToggleButton freehandToolButton;
+    @FXML
+    private ToggleButton bezierToolButton;
 
     // Color Preview and Labels
     @FXML
@@ -239,6 +247,17 @@ public class MainView {
     @FXML
     private Button applySauvolaThresholdingButton;
 
+    @FXML
+    private TableView<Point2D> controlPointsTable;
+    @FXML
+    private TableColumn<Point2D, Number> pointIndexColumn;
+    @FXML
+    private TableColumn<Point2D, Double> pointXColumn;
+    @FXML
+    private TableColumn<Point2D, Double> pointYColumn;
+
+    private ObservableList<Point2D> controlPointsData = FXCollections.observableArrayList();
+
     private Group root3D;
     private double mousePosX, mousePosY;
     private double mouseOldX, mouseOldY;
@@ -262,7 +281,56 @@ public class MainView {
         bindColorProperties();
         setUp3DScene();
         mainViewModel.setRedrawCanvasCallback(this::redrawCanvas);
+        mainViewModel.currentShapeProperty().addListener((obs, oldShape, newShape) -> {
+            if (newShape instanceof BezierCurveModel) {
+                BezierCurveModel bezierCurve = (BezierCurveModel) newShape;
+                controlPointsData.setAll(bezierCurve.getControlPoints());
+            } else {
+                controlPointsData.clear();
+            }
+        });
+        bindControlPointsTable();
         redrawCanvas();
+    }
+
+    private void bindControlPointsTable() {
+        pointIndexColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(controlPointsData.indexOf(cellData.getValue())));
+        pointXColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getX()).asObject());
+        pointYColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getY()).asObject());
+
+        controlPointsTable.setItems(controlPointsData);
+
+        controlPointsTable.setEditable(true);
+        pointXColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        pointYColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+
+        pointXColumn.setOnEditCommit(event -> {
+            Point2D point = event.getRowValue();
+            int index = controlPointsData.indexOf(point);
+            Double newValue = event.getNewValue();
+            Point2D newPoint = new Point2D(newValue, point.getY());
+            controlPointsData.set(index, newPoint);
+            updateBezierControlPoint(index, newPoint);
+        });
+
+        pointYColumn.setOnEditCommit(event -> {
+            Point2D point = event.getRowValue();
+            int index = controlPointsData.indexOf(point);
+            Double newValue = event.getNewValue();
+            Point2D newPoint = new Point2D(point.getX(), newValue);
+            controlPointsData.set(index, newPoint);
+            updateBezierControlPoint(index, newPoint);
+        });
+    }
+
+    private void updateBezierControlPoint(int index, Point2D newPoint) {
+        ShapeModel shape = mainViewModel.getCurrentShape();
+        if (shape instanceof BezierCurveModel) {
+            BezierCurveModel bezierCurve = (BezierCurveModel) shape;
+            bezierCurve.getControlPoints().set(index, newPoint);
+            controlPointsData.set(index, newPoint); // Update the table data
+            redrawCanvas(); // Call the redraw method
+        }
     }
 
     private void onApplyAddition() {
@@ -639,6 +707,7 @@ public class MainView {
         ellipseToolButton.setUserData(Tool.ELLIPSE);
         lineToolButton.setUserData(Tool.LINE);
         freehandToolButton.setUserData(Tool.FREEHAND);
+        bezierToolButton.setUserData(Tool.BEZIER);
 
         toolToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle != null) {
@@ -646,6 +715,24 @@ public class MainView {
                 Tool selectedTool = (Tool) selectedButton.getUserData();
                 Command command = new SetToolCommand(mainViewModel, selectedTool);
                 eventQueue.enqueue(command);
+
+                if (selectedTool == Tool.BEZIER) {
+                    Platform.runLater(() -> {
+                        TextInputDialog dialog = new TextInputDialog("3");
+                        dialog.setTitle("Bezier Curve Degree");
+                        dialog.setHeaderText("Enter the degree of the Bezier curve:");
+                        dialog.setContentText("Degree:");
+                        Optional<String> result = dialog.showAndWait();
+                        result.ifPresent(degreeStr -> {
+                            try {
+                                int degree = Integer.parseInt(degreeStr);
+                                mainViewModel.setBezierDegree(degree);
+                            } catch (NumberFormatException e) {
+                                showAlert("Invalid Input", "Please enter a valid integer for the degree.");
+                            }
+                        });
+                    });
+                }
             }
         });
 

@@ -83,5 +83,8 @@ public interface IMainViewModel {
 
     BooleanProperty isProcessingProperty();
     void setIsProcessing(boolean isProcessing);
-    boolean isProcessing();
+
+    void setBezierDegree(int degree);
+    ShapeModel getCurrentShape();
+    ObjectProperty<ShapeModel> currentShapeProperty();
 }

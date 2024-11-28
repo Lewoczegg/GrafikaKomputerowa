@@ -35,6 +35,7 @@
                 <ToggleButton fx:id="ellipseToolButton" text="Ellipse" userData="ELLIPSE" toggleGroup="$toolToggleGroup"/>
                 <ToggleButton fx:id="lineToolButton" text="Line" userData="LINE" toggleGroup="$toolToggleGroup"/>
                 <ToggleButton fx:id="freehandToolButton" text="Freehand" userData="FREEHAND" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="bezierToolButton" text="Bezier" userData="BEZIER" toggleGroup="$toolToggleGroup"/>
             </ToolBar>
         </VBox>
     </top>
@@ -363,6 +364,13 @@
                                             </TitledPane>
                                         </VBox>
                                     </TitledPane>
+                                    <TableView fx:id="controlPointsTable" prefHeight="200">
+                                        <columns>
+                                            <TableColumn fx:id="pointIndexColumn" text="Index" />
+                                            <TableColumn fx:id="pointXColumn" text="X" />
+                                            <TableColumn fx:id="pointYColumn" text="Y" />
+                                        </columns>
+                                    </TableView>
                                 </VBox>
                             </ScrollPane>
                         </content>

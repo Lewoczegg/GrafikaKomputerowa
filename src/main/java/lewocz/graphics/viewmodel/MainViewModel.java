@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
@@ -105,6 +106,16 @@ public class MainViewModel implements IMainViewModel {
         this.currentImageModel = imageModel;
     }
 
+    private int bezierDegree = 3;
+
+    public void setBezierDegree(int degree) {
+        this.bezierDegree = degree;
+    }
+
+    public int getBezierDegree() {
+        return bezierDegree;
+    }
+
 
     @Override
     public void onMousePressed(double x, double y) {
@@ -128,6 +139,16 @@ public class MainViewModel implements IMainViewModel {
                 freehand.addPoint(x, y);
                 tempShape.set(freehand);
                 break;
+            case BEZIER:
+                if (tempShape.get() == null) {
+                    BezierCurveModel bezierCurve = new BezierCurveModel();
+                    bezierCurve.addControlPoint(x, y);
+                    tempShape.set(bezierCurve);
+                } else {
+                    BezierCurveModel bezierCurve = (BezierCurveModel) tempShape.get();
+                    bezierCurve.addControlPoint(x, y);
+                }
+                break;
             default:
                 break;
         }
@@ -148,7 +169,7 @@ public class MainViewModel implements IMainViewModel {
                 if (currentShape.get() != null) {
                     double deltaX = endX - startX;
                     double deltaY = endY - startY;
-                    moveCurrentShape(deltaX, deltaY);
+                    currentShape.get().moveBy(deltaX, deltaY);
                     startX = endX;
                     startY = endY;
                 }
@@ -162,6 +183,16 @@ public class MainViewModel implements IMainViewModel {
             case FREEHAND:
                 if (tempShape.get() instanceof FreehandModel) {
                     ((FreehandModel) tempShape.get()).addPoint(endX, endY);
+                }
+                break;
+            case BEZIER:
+                if (tempShape.get() instanceof BezierCurveModel) {
+                    BezierCurveModel bezierCurve = (BezierCurveModel) tempShape.get();
+                    // Update the last control point to the current mouse position
+                    int lastIndex = bezierCurve.getControlPoints().size() - 1;
+                    if (lastIndex >= 0) {
+                        bezierCurve.getControlPoints().set(lastIndex, new Point2D(x, y));
+                    }
                 }
                 break;
             default:
@@ -198,6 +229,22 @@ public class MainViewModel implements IMainViewModel {
                     tempShape.set(null);
                 }
                 break;
+            case BEZIER:
+                if (tempShape.get() instanceof BezierCurveModel) {
+                    BezierCurveModel bezierCurve = (BezierCurveModel) tempShape.get();
+                    if (bezierCurve.getControlPoints().size() >= (bezierDegree + 1)) {
+                        bezierCurve.setStrokeColor(strokeColor.get());
+                        bezierCurve.setStrokeWidth(strokeWidth.get());
+                        addShape(bezierCurve);
+                        tempShape.set(null);
+                    }
+                }
+                break;
+            case SELECT:
+                if (currentShape.get() instanceof BezierCurveModel) {
+                    ((BezierCurveModel) currentShape.get()).setSelectedControlPoint(null);
+                }
+                break;
             default:
                 break;
         }
@@ -205,18 +252,26 @@ public class MainViewModel implements IMainViewModel {
         requestRedraw();
     }
 
+    public ShapeModel getCurrentShape() {
+        return currentShape.get();
+    }
+
+    public ObjectProperty<ShapeModel> currentShapeProperty() {
+        return currentShape;
+    }
+
     private void addShape(ShapeModel shape) {
         shapes.add(shape);
     }
 
     private void selectShapeAt(double x, double y) {
-        for (ShapeModel shape : getShapes()) {
-            if (shape.containsPoint(x, y)) {
-                currentShape.set(shape);
-                return;
+            for (ShapeModel shape : getShapes()) {
+                if (shape.containsPoint(x, y)) {
+                    currentShape.set(shape);
+                    return;
+                }
             }
-        }
-        currentShape.set(null);
+            currentShape.set(null);
     }
 
     private void moveCurrentShape(double deltaX, double deltaY) {
@@ -735,11 +790,6 @@ public class MainViewModel implements IMainViewModel {
     @Override
     public void setIsProcessing(boolean isProcessing) {
         this.isProcessing.set(isProcessing);
-    }
-
-    @Override
-    public boolean isProcessing() {
-        return isProcessing.get();
     }
 
     @Override

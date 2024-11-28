@@ -6,5 +6,6 @@ public enum Tool {
     QUADRILATERAL,
     ELLIPSE,
     LINE,
-    FREEHAND
+    FREEHAND,
+    BEZIER
 }
