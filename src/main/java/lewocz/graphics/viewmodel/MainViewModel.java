@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class MainViewModel implements IMainViewModel {
@@ -63,6 +65,16 @@ public class MainViewModel implements IMainViewModel {
     private boolean isDragging;
     private final BooleanProperty isProcessing = new SimpleBooleanProperty(false);
 
+    // For Scaling
+    private Point2D scalingPivotPoint;
+    private boolean isScaling = false;
+    private double initialDistance;
+
+    // For Rotation
+    private Point2D rotationPivotPoint;
+    private boolean isRotating = false;
+    private double initialAngle;
+
     public MainViewModel() {
         // Initialize listeners for color properties
         initializeColorListeners();
@@ -98,10 +110,6 @@ public class MainViewModel implements IMainViewModel {
 
     private ImageModel currentImageModel;
 
-    public ImageModel getCurrentImageModel() {
-        return currentImageModel;
-    }
-
     public void setCurrentImageModel(ImageModel imageModel) {
         this.currentImageModel = imageModel;
     }
@@ -112,9 +120,7 @@ public class MainViewModel implements IMainViewModel {
         this.bezierDegree = degree;
     }
 
-    public int getBezierDegree() {
-        return bezierDegree;
-    }
+    private List<Point2D> tempPolygonPoints = new ArrayList<>();
 
 
     @Override
@@ -149,6 +155,29 @@ public class MainViewModel implements IMainViewModel {
                     bezierCurve.addControlPoint(x, y);
                 }
                 break;
+            case POLYGON:
+                tempPolygonPoints.add(new Point2D(x, y));
+                updateTempPolygonShape();
+                break;
+            case ROTATE:
+                if (rotationPivotPoint == null) {
+                    rotationPivotPoint = new Point2D(x, y);
+                    requestRedraw();
+                } else if (currentShape.get() != null) {
+                    isRotating = true;
+                    initialAngle = calculateAngle(rotationPivotPoint, new Point2D(x, y));
+                }
+                break;
+
+            case SCALE:
+                if (scalingPivotPoint == null) {
+                    scalingPivotPoint = new Point2D(x, y);
+                    requestRedraw();
+                } else if (currentShape.get() != null) {
+                    isScaling = true;
+                    initialDistance = scalingPivotPoint.distance(x, y);
+                }
+                break;
             default:
                 break;
         }
@@ -177,6 +206,7 @@ public class MainViewModel implements IMainViewModel {
             case TRIANGLE:
             case QUADRILATERAL:
             case ELLIPSE:
+            case POLYGON:
             case LINE:
                 updateTempShape(tempShape.get(), startX, startY, endX, endY);
                 break;
@@ -193,6 +223,23 @@ public class MainViewModel implements IMainViewModel {
                     if (lastIndex >= 0) {
                         bezierCurve.getControlPoints().set(lastIndex, new Point2D(x, y));
                     }
+                }
+                break;
+            case ROTATE:
+                if (isRotating && currentShape.get() != null) {
+                    double currentAngle = calculateAngle(rotationPivotPoint, new Point2D(x, y));
+                    double angleDifference = currentAngle - initialAngle;
+                    currentShape.get().rotate(angleDifference, rotationPivotPoint.getX(), rotationPivotPoint.getY());
+                    initialAngle = currentAngle;
+                }
+                break;
+
+            case SCALE:
+                if (isScaling && currentShape.get() != null) {
+                    double currentDistance = scalingPivotPoint.distance(x, y);
+                    double scaleFactor = currentDistance / initialDistance;
+                    currentShape.get().scale(scaleFactor, scalingPivotPoint.getX(), scalingPivotPoint.getY());
+                    initialDistance = currentDistance;
                 }
                 break;
             default:
@@ -245,11 +292,77 @@ public class MainViewModel implements IMainViewModel {
                     ((BezierCurveModel) currentShape.get()).setSelectedControlPoint(null);
                 }
                 break;
+            case ROTATE:
+                if (isRotating) {
+                    isRotating = false;
+                    rotationPivotPoint = null;
+                }
+                break;
+            case SCALE:
+                if (isScaling) {
+                    isScaling = false;
+                    scalingPivotPoint = null;
+                }
+                break;
             default:
                 break;
         }
 
         requestRedraw();
+    }
+
+    @Override
+    public void rotateShape(double angle, double pivotX, double pivotY) {
+        getCurrentShape().rotate(angle, pivotX, pivotY);
+        requestRedraw();
+    }
+
+    @Override
+    public void scaleShape(double factor, double pivotX, double pivotY) {
+        getCurrentShape().scale(factor, pivotX, pivotY);
+        requestRedraw();
+    }
+
+    private double calculateAngle(Point2D pivot, Point2D point) {
+        return Math.toDegrees(Math.atan2(point.getY() - pivot.getY(), point.getX() - pivot.getX()));
+    }
+
+    public void finishPolygon() {
+        if (tempPolygonPoints.size() > 2) {
+            PolygonModel polygon = new PolygonModel(tempPolygonPoints, strokeColor.get(), fillColor.get(), strokeWidth.get());
+            addShape(polygon);
+            tempPolygonPoints.clear();
+            tempShape.set(null);
+            requestRedraw();
+        } else {
+            // Not enough points to form a polygon
+            tempPolygonPoints.clear();
+            tempShape.set(null);
+            requestRedraw();
+        }
+    }
+
+    private void updateTempPolygonShape() {
+        if (tempPolygonPoints.size() > 1) {
+            tempShape.set(new PolygonModel(tempPolygonPoints, strokeColor.get(), fillColor.get(), strokeWidth.get()));
+        } else {
+            tempShape.set(null);
+        }
+    }
+
+    public void saveShapesToFile(File file) throws IOException {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
+            out.writeObject(new ArrayList<>(shapes));
+        }
+    }
+
+    public void loadShapesFromFile(File file) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+            List<ShapeModel> loadedShapes = (List<ShapeModel>) in.readObject();
+            shapes.clear();
+            shapes.addAll(loadedShapes);
+            requestRedraw();
+        }
     }
 
     public ShapeModel getCurrentShape() {

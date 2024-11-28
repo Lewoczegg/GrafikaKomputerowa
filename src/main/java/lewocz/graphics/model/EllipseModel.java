@@ -40,4 +40,29 @@ public class EllipseModel extends ShapeModel {
         centerX += deltaX;
         centerY += deltaY;
     }
+
+    @Override
+    public void rotate(double angle, double pivotX, double pivotY) {
+        double radians = Math.toRadians(angle);
+        double translatedX = centerX - pivotX;
+        double translatedY = centerY - pivotY;
+
+        double rotatedX = translatedX * Math.cos(radians) - translatedY * Math.sin(radians);
+        double rotatedY = translatedX * Math.sin(radians) + translatedY * Math.cos(radians);
+
+        centerX = rotatedX + pivotX;
+        centerY = rotatedY + pivotY;
+    }
+
+    @Override
+    public void scale(double factor, double pivotX, double pivotY) {
+        double translatedX = centerX - pivotX;
+        double translatedY = centerY - pivotY;
+
+        centerX = translatedX * factor + pivotX;
+        centerY = translatedY * factor + pivotY;
+
+        radiusX *= factor;
+        radiusY *= factor;
+    }
 }

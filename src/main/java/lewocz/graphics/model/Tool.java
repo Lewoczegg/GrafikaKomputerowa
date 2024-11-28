@@ -7,5 +7,8 @@ public enum Tool {
     ELLIPSE,
     LINE,
     FREEHAND,
-    BEZIER
+    BEZIER,
+    POLYGON,
+    ROTATE,
+    SCALE
 }

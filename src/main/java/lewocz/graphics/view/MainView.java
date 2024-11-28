@@ -56,6 +56,15 @@ public class MainView {
     private ToggleButton freehandToolButton;
     @FXML
     private ToggleButton bezierToolButton;
+    @FXML
+    private ToggleButton polygonToolButton;
+    @FXML
+    private Button finishPolygonButton;
+    @FXML
+    private ToggleButton rotateToolButton;
+    @FXML
+    private ToggleButton scaleToolButton;
+
 
     // Color Preview and Labels
     @FXML
@@ -256,6 +265,23 @@ public class MainView {
     @FXML
     private TableColumn<Point2D, Double> pointYColumn;
 
+    @FXML
+    private TextField rotationPivotXField;
+    @FXML
+    private TextField rotationPivotYField;
+    @FXML
+    private TextField rotationAngleField;
+    @FXML
+    private Button applyRotationButton;
+    @FXML
+    private TextField scalingPivotXField;
+    @FXML
+    private TextField scalingPivotYField;
+    @FXML
+    private TextField scaleFactorField;
+    @FXML
+    private Button applyScaleButton;
+
     private ObservableList<Point2D> controlPointsData = FXCollections.observableArrayList();
 
     private Group root3D;
@@ -396,6 +422,49 @@ public class MainView {
         } catch (NumberFormatException e) {
             showAlert("Invalid Input", "Please enter a valid number for brightness change.");
         }
+    }
+
+    @FXML
+    private void onApplyRotation() {
+        try {
+            double pivotX = Double.parseDouble(rotationPivotXField.getText());
+            double pivotY = Double.parseDouble(rotationPivotYField.getText());
+            double angle = Double.parseDouble(rotationAngleField.getText());
+
+            if (mainViewModel.getCurrentShape() == null) {
+                showAlert("No Shape Selected", "Please select a shape to rotate.");
+                return;
+            }
+
+            Command command = new RotateCommand(mainViewModel, angle, pivotX, pivotY);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter valid numbers for pivot point and angle.");
+        }
+    }
+
+    @FXML
+    private void onApplyScaling() {
+        try {
+            double pivotX = Double.parseDouble(scalingPivotXField.getText());
+            double pivotY = Double.parseDouble(scalingPivotYField.getText());
+            double factor = Double.parseDouble(scaleFactorField.getText());
+
+            if (mainViewModel.getCurrentShape() == null) {
+                showAlert("No Shape Selected", "Please select a shape to scale.");
+                return;
+            }
+
+            Command command = new ScaleCommand(mainViewModel, factor, pivotX, pivotY);
+            eventQueue.enqueue(command);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter valid numbers for pivot point and scale factor.");
+        }
+    }
+
+    @FXML
+    private void onFinishPolygon() {
+        mainViewModel.finishPolygon();
     }
 
     private void onApplyGrayscaleAverage() {
@@ -708,6 +777,9 @@ public class MainView {
         lineToolButton.setUserData(Tool.LINE);
         freehandToolButton.setUserData(Tool.FREEHAND);
         bezierToolButton.setUserData(Tool.BEZIER);
+        polygonToolButton.setUserData(Tool.POLYGON);
+        rotateToolButton.setUserData(Tool.ROTATE);
+        scaleToolButton.setUserData(Tool.SCALE);
 
         toolToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle != null) {

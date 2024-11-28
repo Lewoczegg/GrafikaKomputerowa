@@ -35,4 +35,12 @@ public class ImageModel extends ShapeModel {
         this.x += deltaX;
         this.y += deltaY;
     }
+
+    @Override
+    public void rotate(double angle, double pivotX, double pivotY) {
+    }
+
+    @Override
+    public void scale(double factor, double pivotX, double pivotY) {
+    }
 }

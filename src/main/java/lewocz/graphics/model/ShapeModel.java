@@ -15,4 +15,6 @@ public abstract class ShapeModel {
     public abstract void draw(GraphicsContext gc);
     public abstract boolean containsPoint(double x, double y);
     public abstract void moveBy(double deltaX, double deltaY);
+    public abstract void rotate(double angle, double pivotX, double pivotY);
+    public abstract void scale(double factor, double pivotX, double pivotY);
 }

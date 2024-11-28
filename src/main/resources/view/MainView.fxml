@@ -36,6 +36,10 @@
                 <ToggleButton fx:id="lineToolButton" text="Line" userData="LINE" toggleGroup="$toolToggleGroup"/>
                 <ToggleButton fx:id="freehandToolButton" text="Freehand" userData="FREEHAND" toggleGroup="$toolToggleGroup"/>
                 <ToggleButton fx:id="bezierToolButton" text="Bezier" userData="BEZIER" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="polygonToolButton" text="Polygon" userData="POLYGON" toggleGroup="$toolToggleGroup"/>
+                <Button fx:id="finishPolygonButton" text="Finish Polygon" onAction="#onFinishPolygon"/>
+                <ToggleButton fx:id="rotateToolButton" text="Rotate" userData="ROTATE" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="scaleToolButton" text="Scale" userData="SCALE" toggleGroup="$toolToggleGroup"/>
             </ToolBar>
         </VBox>
     </top>
@@ -364,15 +368,59 @@
                                             </TitledPane>
                                         </VBox>
                                     </TitledPane>
-                                    <TableView fx:id="controlPointsTable" prefHeight="200">
-                                        <columns>
-                                            <TableColumn fx:id="pointIndexColumn" text="Index" />
-                                            <TableColumn fx:id="pointXColumn" text="X" />
-                                            <TableColumn fx:id="pointYColumn" text="Y" />
-                                        </columns>
-                                    </TableView>
                                 </VBox>
                             </ScrollPane>
+                        </content>
+                    </Tab>
+                    <Tab text="Bezier, Scale, Rotate">
+                        <content>
+                            <VBox spacing="10">
+                                <padding>
+                                    <Insets top="10" right="10" bottom="10" left="10" />
+                                </padding>
+
+                                <TableView fx:id="controlPointsTable" prefHeight="200">
+                                    <columns>
+                                        <TableColumn fx:id="pointIndexColumn" text="Index" />
+                                        <TableColumn fx:id="pointXColumn" text="X" />
+                                        <TableColumn fx:id="pointYColumn" text="Y" />
+                                    </columns>
+                                </TableView>
+                                <TitledPane text="Rotation" expanded="false">
+                                    <VBox spacing="5">
+                                        <HBox spacing="5">
+                                            <Label text="Pivot X:" />
+                                            <TextField fx:id="rotationPivotXField" prefWidth="50" />
+                                        </HBox>
+                                        <HBox spacing="5">
+                                            <Label text="Pivot Y:" />
+                                            <TextField fx:id="rotationPivotYField" prefWidth="50" />
+                                        </HBox>
+                                        <HBox spacing="5">
+                                            <Label text="Angle (degrees):" />
+                                            <TextField fx:id="rotationAngleField" prefWidth="50" />
+                                        </HBox>
+                                        <Button fx:id="applyRotationButton" text="Apply Rotation" onAction="#onApplyRotation" />
+                                    </VBox>
+                                </TitledPane>
+                                <TitledPane text="Scaling" expanded="false">
+                                    <VBox spacing="5">
+                                        <HBox spacing="5">
+                                            <Label text="Pivot X:" />
+                                            <TextField fx:id="scalingPivotXField" prefWidth="60" />
+                                        </HBox>
+                                        <HBox spacing="5">
+                                            <Label text="Pivot Y:" />
+                                            <TextField fx:id="scalingPivotYField" prefWidth="60" />
+                                        </HBox>
+                                        <HBox spacing="5">
+                                            <Label text="Scale Factor:" />
+                                            <TextField fx:id="scaleFactorField" prefWidth="60" />
+                                        </HBox>
+                                        <Button fx:id="applyScaleButton" text="Apply Scaling" onAction="#onApplyScaling" />
+                                    </VBox>
+                                </TitledPane>
+                            </VBox>
                         </content>
                     </Tab>
                 </tabs>

@@ -65,6 +65,32 @@ public class FreehandModel extends ShapeModel {
         }
     }
 
+    @Override
+    public void rotate(double angle, double pivotX, double pivotY) {
+        double radians = Math.toRadians(angle);
+        for (int i = 0; i < xPoints.size(); i++) {
+            double x = xPoints.get(i) - pivotX;
+            double y = yPoints.get(i) - pivotY;
+
+            double rotatedX = x * Math.cos(radians) - y * Math.sin(radians);
+            double rotatedY = x * Math.sin(radians) + y * Math.cos(radians);
+
+            xPoints.set(i, rotatedX + pivotX);
+            yPoints.set(i, rotatedY + pivotY);
+        }
+    }
+
+    @Override
+    public void scale(double factor, double pivotX, double pivotY) {
+        for (int i = 0; i < xPoints.size(); i++) {
+            double x = xPoints.get(i) - pivotX;
+            double y = yPoints.get(i) - pivotY;
+
+            xPoints.set(i, x * factor + pivotX);
+            yPoints.set(i, y * factor + pivotY);
+        }
+    }
+
     private boolean isPointNearLine(double px, double py, double x1, double y1, double x2, double y2, double tolerance) {
         double distance = distanceFromPointToLine(px, py, x1, y1, x2, y2);
         return distance <= tolerance;

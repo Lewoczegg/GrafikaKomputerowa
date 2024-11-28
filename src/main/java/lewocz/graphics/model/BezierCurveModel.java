@@ -90,4 +90,33 @@ public class BezierCurveModel extends ShapeModel {
             }
         }
     }
+
+    @Override
+    public void rotate(double angle, double pivotX, double pivotY) {
+        double radians = Math.toRadians(angle);
+        for (int i = 0; i < controlPoints.size(); i++) {
+            Point2D point = controlPoints.get(i);
+            double translatedX = point.getX() - pivotX;
+            double translatedY = point.getY() - pivotY;
+
+            double rotatedX = translatedX * Math.cos(radians) - translatedY * Math.sin(radians);
+            double rotatedY = translatedX * Math.sin(radians) + translatedY * Math.cos(radians);
+
+            controlPoints.set(i, new Point2D(rotatedX + pivotX, rotatedY + pivotY));
+        }
+    }
+
+    @Override
+    public void scale(double factor, double pivotX, double pivotY) {
+        for (int i = 0; i < controlPoints.size(); i++) {
+            Point2D point = controlPoints.get(i);
+            double translatedX = point.getX() - pivotX;
+            double translatedY = point.getY() - pivotY;
+
+            double scaledX = translatedX * factor;
+            double scaledY = translatedY * factor;
+
+            controlPoints.set(i, new Point2D(scaledX + pivotX, scaledY + pivotY));
+        }
+    }
 }

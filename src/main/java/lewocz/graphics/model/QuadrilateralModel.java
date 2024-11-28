@@ -44,4 +44,27 @@ public class QuadrilateralModel extends ShapeModel {
         gc.strokePolygon(xPoints, yPoints, 4);
         gc.fillPolygon(xPoints, yPoints, 4);
     }
+
+    @Override
+    public void rotate(double angle, double pivotX, double pivotY) {
+        double radians = Math.toRadians(angle);
+        for (int i = 0; i < 4; i++) {
+            double dx = xPoints[i] - pivotX;
+            double dy = yPoints[i] - pivotY;
+
+            double rotatedX = dx * Math.cos(radians) - dy * Math.sin(radians);
+            double rotatedY = dx * Math.sin(radians) + dy * Math.cos(radians);
+
+            xPoints[i] = rotatedX + pivotX;
+            yPoints[i] = rotatedY + pivotY;
+        }
+    }
+
+    @Override
+    public void scale(double factor, double pivotX, double pivotY) {
+        for (int i = 0; i < 4; i++) {
+            xPoints[i] = (xPoints[i] - pivotX) * factor + pivotX;
+            yPoints[i] = (yPoints[i] - pivotY) * factor + pivotY;
+        }
+    }
 }

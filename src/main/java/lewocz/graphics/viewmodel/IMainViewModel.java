@@ -87,4 +87,7 @@ public interface IMainViewModel {
     void setBezierDegree(int degree);
     ShapeModel getCurrentShape();
     ObjectProperty<ShapeModel> currentShapeProperty();
+    void finishPolygon();
+    void rotateShape(double angle, double pivotX, double pivotY);
+    void scaleShape(double factor, double pivotX, double pivotY);
 }

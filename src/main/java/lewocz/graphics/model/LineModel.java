@@ -45,6 +45,34 @@ public class LineModel extends ShapeModel {
         this.endY += deltaY;
     }
 
+    @Override
+    public void rotate(double angle, double pivotX, double pivotY) {
+        double radians = Math.toRadians(angle);
+
+        double dx = startX - pivotX;
+        double dy = startY - pivotY;
+        double rotatedX = dx * Math.cos(radians) - dy * Math.sin(radians);
+        double rotatedY = dx * Math.sin(radians) + dy * Math.cos(radians);
+        startX = rotatedX + pivotX;
+        startY = rotatedY + pivotY;
+
+        dx = endX - pivotX;
+        dy = endY - pivotY;
+        rotatedX = dx * Math.cos(radians) - dy * Math.sin(radians);
+        rotatedY = dx * Math.sin(radians) + dy * Math.cos(radians);
+        endX = rotatedX + pivotX;
+        endY = rotatedY + pivotY;
+    }
+
+    @Override
+    public void scale(double factor, double pivotX, double pivotY) {
+        startX = (startX - pivotX) * factor + pivotX;
+        startY = (startY - pivotY) * factor + pivotY;
+
+        endX = (endX - pivotX) * factor + pivotX;
+        endY = (endY - pivotY) * factor + pivotY;
+    }
+
     private boolean isPointNearLine(double px, double py, double x1, double y1, double x2, double y2, double tolerance) {
         double distance = distanceFromPointToLine(px, py, x1, y1, x2, y2);
         return distance <= tolerance;
