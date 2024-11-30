@@ -4,7 +4,10 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class ImageProcessor {
 
@@ -806,5 +809,144 @@ public class ImageProcessor {
         }
 
         return result;
+    }
+
+    public static double calculateColorPercentage(WritableImage image, Color targetColor, double tolerance) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+        int totalPixels = width * height;
+        int matchingPixels = 0;
+
+        PixelReader reader = image.getPixelReader();
+        double toleranceNormalized = tolerance / 100.0; // Normalize tolerance to [0,1]
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color color = reader.getColor(x, y);
+                if (isColorWithinTolerance(color, targetColor, toleranceNormalized)) {
+                    matchingPixels++;
+                }
+            }
+        }
+
+        return (matchingPixels / (double) totalPixels) * 100.0; // Return percentage
+    }
+
+    public static WritableImage detectLargestColorArea(WritableImage image, Color targetColor, double tolerance) {
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
+
+        PixelReader reader = image.getPixelReader();
+
+        // Create a binary mask where true represents pixels within the color range
+        boolean[][] colorMask = new boolean[height][width];
+        double toleranceNormalized = tolerance / 100.0; // Normalize tolerance to [0,1]
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color color = reader.getColor(x, y);
+                colorMask[y][x] = isColorWithinTolerance(color, targetColor, toleranceNormalized);
+            }
+        }
+
+        // Label connected components
+        int[][] labels = new int[height][width];
+        int label = 1;
+        Map<Integer, Integer> labelSizes = new HashMap<>();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (colorMask[y][x] && labels[y][x] == 0) {
+                    int size = floodFill(colorMask, labels, x, y, label);
+                    labelSizes.put(label, size);
+                    label++;
+                }
+            }
+        }
+
+        // Find the label with the largest size
+        int largestLabel = -1;
+        int maxSize = 0;
+        for (Map.Entry<Integer, Integer> entry : labelSizes.entrySet()) {
+            if (entry.getValue() > maxSize) {
+                maxSize = entry.getValue();
+                largestLabel = entry.getKey();
+            }
+        }
+
+        // Create an output image highlighting the largest area
+        WritableImage outputImage = new WritableImage(width, height);
+        PixelWriter writer = outputImage.getPixelWriter();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (labels[y][x] == largestLabel) {
+                    // Highlight the largest area (e.g., overlay a semi-transparent color)
+                    Color originalColor = reader.getColor(x, y);
+                    Color highlightColor = Color.color(1.0, 0, 0, 0.5); // Semi-transparent red
+                    Color blendedColor = blendColors(originalColor, highlightColor);
+                    writer.setColor(x, y, blendedColor);
+                } else {
+                    // Copy original pixel
+                    writer.setColor(x, y, reader.getColor(x, y));
+                }
+            }
+        }
+
+        return outputImage;
+    }
+
+    private static boolean isColorWithinTolerance(Color color, Color targetColor, double tolerance) {
+        double distance = colorDistance(color, targetColor);
+        return distance <= tolerance;
+    }
+
+    private static double colorDistance(Color c1, Color c2) {
+        // Calculate Euclidean distance between two colors in RGB space
+        double dr = c1.getRed() - c2.getRed();
+        double dg = c1.getGreen() - c2.getGreen();
+        double db = c1.getBlue() - c2.getBlue();
+        return Math.sqrt(dr * dr + dg * dg + db * db);
+    }
+
+    private static Color blendColors(Color baseColor, Color blendColor) {
+        double alpha = blendColor.getOpacity();
+        double r = (1 - alpha) * baseColor.getRed() + alpha * blendColor.getRed();
+        double g = (1 - alpha) * baseColor.getGreen() + alpha * blendColor.getGreen();
+        double b = (1 - alpha) * baseColor.getBlue() + alpha * blendColor.getBlue();
+        return new Color(r, g, b, 1.0);
+    }
+
+    // Helper method for flood fill
+    private static int floodFill(boolean[][] mask, int[][] labels, int x, int y, int label) {
+        int width = mask[0].length;
+        int height = mask.length;
+        int size = 0;
+
+        Stack<Point> stack = new Stack<>();
+        stack.push(new Point(x, y));
+
+        while (!stack.isEmpty()) {
+            Point p = stack.pop();
+            int px = p.x;
+            int py = p.y;
+
+            if (px < 0 || px >= width || py < 0 || py >= height) {
+                continue;
+            }
+
+            if (mask[py][px] && labels[py][px] == 0) {
+                labels[py][px] = label;
+                size++;
+
+                // Add neighboring pixels to the stack
+                stack.push(new Point(px + 1, py));
+                stack.push(new Point(px - 1, py));
+                stack.push(new Point(px, py + 1));
+                stack.push(new Point(px, py - 1));
+            }
+        }
+
+        return size;
     }
 }

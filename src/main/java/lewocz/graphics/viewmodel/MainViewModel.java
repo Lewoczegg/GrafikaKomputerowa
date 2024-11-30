@@ -844,6 +844,32 @@ public class MainViewModel implements IMainViewModel {
         }
     }
 
+    @Override
+    public void calculateColorPercentage(Color targetColor, double tolerance) {
+        if (currentImageModel != null) {
+            WritableImage image = currentImageModel.getImage();
+            double percentage = ImageProcessor.calculateColorPercentage(image, targetColor, tolerance);
+            // Display the result to the user (e.g., via an alert or update a property)
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Color Percentage");
+                alert.setHeaderText(null);
+                alert.setContentText(String.format("Pixels within the specified color range constitute %.2f%% of the image.", percentage));
+                alert.showAndWait();
+            });
+        }
+    }
+
+    @Override
+    public void detectLargestColorArea(Color targetColor, double tolerance) {
+        if (currentImageModel != null) {
+            WritableImage image = currentImageModel.getImage();
+            WritableImage resultImage = ImageProcessor.detectLargestColorArea(image, targetColor, tolerance);
+            currentImageModel.setImage(resultImage);
+            requestRedraw();
+        }
+    }
+
     // Load and Save Methods
 
     @Override

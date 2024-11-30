@@ -2,6 +2,7 @@ package lewocz.graphics.view.components.imageoperations;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.paint.Color;
 import lewocz.graphics.command.*;
 import lewocz.graphics.event.EventQueue;
 import lewocz.graphics.view.components.IntegerTextField;
@@ -145,6 +146,16 @@ public class ImageOperationsComponent {
     @FXML
     private Button applyHitOrMissButton;
 
+    @FXML
+    private Button calculateColorPercentageButton;
+    @FXML
+    private Button detectColorAreaButton;
+    @FXML
+    private ColorPicker targetColorPicker;
+    @FXML
+    private Slider toleranceSlider;
+
+
     private final IMainViewModel mainViewModel;
     private final EventQueue eventQueue;
 
@@ -185,6 +196,8 @@ public class ImageOperationsComponent {
         applyOpeningButton.setOnAction(e -> onApplyOpening());
         applyClosingButton.setOnAction(e -> onApplyClosing());
         applyHitOrMissButton.setOnAction(e -> onApplyHitOrMiss());
+        calculateColorPercentageButton.setOnAction(e -> onCalculateColorPercentage());
+        detectColorAreaButton.setOnAction(e -> onDetectLargestColorArea());
     }
 
     private void onApplyAddition() {
@@ -477,6 +490,20 @@ public class ImageOperationsComponent {
                 { true, true, true },
                 { true, true, true }
         };
+    }
+
+    private void onCalculateColorPercentage() {
+        Color targetColor = targetColorPicker.getValue();
+        double tolerance = toleranceSlider.getValue();
+        Command command = new CalculateColorPercentageCommand(mainViewModel, targetColor, tolerance);
+        eventQueue.enqueue(command);
+    }
+
+    private void onDetectLargestColorArea() {
+        Color targetColor = targetColorPicker.getValue();
+        double tolerance = toleranceSlider.getValue();
+        Command command = new DetectLargestColorAreaCommand(mainViewModel, targetColor, tolerance);
+        eventQueue.enqueue(command);
     }
 
     private boolean[][] parseMask(String maskText) throws IllegalArgumentException {

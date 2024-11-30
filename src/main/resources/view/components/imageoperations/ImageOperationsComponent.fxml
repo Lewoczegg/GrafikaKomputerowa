@@ -222,5 +222,17 @@
                 </TitledPane>
             </VBox>
         </TitledPane>
+        <TitledPane text="Image Analysis" expanded="false">
+            <VBox spacing="5">
+                <Label text="Select Target Color:" />
+                <ColorPicker fx:id="targetColorPicker" />
+                <Label text="Tolerance (0 to 100):" />
+                <Slider fx:id="toleranceSlider" min="0" max="100" value="10" showTickLabels="true" showTickMarks="true" majorTickUnit="10" minorTickCount="5" blockIncrement="1" />
+                <HBox spacing="10">
+                    <Button fx:id="calculateColorPercentageButton" text="Calculate Color Percentage"/>
+                    <Button fx:id="detectColorAreaButton" text="Detect Largest Color Area"/>
+                </HBox>
+            </VBox>
+        </TitledPane>
     </VBox>
 </ScrollPane>

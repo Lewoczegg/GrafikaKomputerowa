@@ -82,6 +82,8 @@ public interface IMainViewModel {
     void applyOpening(boolean[][] structuringElement);
     void applyClosing(boolean[][] structuringElement);
     void applyHitOrMiss(boolean[][] hitMask, boolean[][] missMask);
+    void calculateColorPercentage(Color targetColor, double tolerance);
+    void detectLargestColorArea(Color targetColor, double tolerance);
 
     BooleanProperty isProcessingProperty();
     void setIsProcessing(boolean isProcessing);
