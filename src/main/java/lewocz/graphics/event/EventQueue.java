@@ -1,10 +1,12 @@
 package lewocz.graphics.event;
 
 import lewocz.graphics.command.Command;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+@Component
 public class EventQueue {
     private final BlockingQueue<Command> commandQueue = new LinkedBlockingQueue<>();
     private volatile boolean isProcessing = false;

@@ -1,6 +1,5 @@
 package lewocz.graphics.view;
 
-import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -8,7 +7,6 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
 import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -37,32 +35,6 @@ import java.util.Optional;
 
 @Component
 public class MainView {
-    @FXML
-    private ToggleGroup toolToggleGroup;
-    @FXML
-    private ToggleButton selectToolButton;
-    @FXML
-    private ToggleButton triangleToolButton;
-    @FXML
-    private ToggleButton quadrilateralToolButton;
-    @FXML
-    private ToggleButton ellipseToolButton;
-    @FXML
-    private ToggleButton lineToolButton;
-    @FXML
-    private ToggleButton freehandToolButton;
-    @FXML
-    private ToggleButton bezierToolButton;
-    @FXML
-    private ToggleButton polygonToolButton;
-    @FXML
-    private Button finishPolygonButton;
-    @FXML
-    private ToggleButton rotateToolButton;
-    @FXML
-    private ToggleButton scaleToolButton;
-
-
     // Color Preview and Labels
     @FXML
     private Rectangle colorPreview;
@@ -293,12 +265,13 @@ public class MainView {
     private double rotateY = 0;
 
     private final IMainViewModel mainViewModel;
-    private final EventQueue eventQueue = new EventQueue();
+    private final EventQueue eventQueue;
 
     private GraphicsContext gc;
 
-    public MainView(IMainViewModel mainViewModel) {
+    public MainView(IMainViewModel mainViewModel, EventQueue eventQueue) {
         this.mainViewModel = mainViewModel;
+        this.eventQueue = eventQueue;
     }
 
     @FXML
@@ -800,44 +773,6 @@ public class MainView {
     }
 
     private void bindProperties() {
-        selectToolButton.setUserData(Tool.SELECT);
-        triangleToolButton.setUserData(Tool.TRIANGLE);
-        quadrilateralToolButton.setUserData(Tool.QUADRILATERAL);
-        ellipseToolButton.setUserData(Tool.ELLIPSE);
-        lineToolButton.setUserData(Tool.LINE);
-        freehandToolButton.setUserData(Tool.FREEHAND);
-        bezierToolButton.setUserData(Tool.BEZIER);
-        polygonToolButton.setUserData(Tool.POLYGON);
-        rotateToolButton.setUserData(Tool.ROTATE);
-        scaleToolButton.setUserData(Tool.SCALE);
-
-        toolToggleGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
-            if (newToggle != null) {
-                ToggleButton selectedButton = (ToggleButton) newToggle;
-                Tool selectedTool = (Tool) selectedButton.getUserData();
-                Command command = new SetToolCommand(mainViewModel, selectedTool);
-                eventQueue.enqueue(command);
-
-                if (selectedTool == Tool.BEZIER) {
-                    Platform.runLater(() -> {
-                        TextInputDialog dialog = new TextInputDialog("3");
-                        dialog.setTitle("Bezier Curve Degree");
-                        dialog.setHeaderText("Enter the degree of the Bezier curve:");
-                        dialog.setContentText("Degree:");
-                        Optional<String> result = dialog.showAndWait();
-                        result.ifPresent(degreeStr -> {
-                            try {
-                                int degree = Integer.parseInt(degreeStr);
-                                mainViewModel.setBezierDegree(degree);
-                            } catch (NumberFormatException e) {
-                                showAlert("Invalid Input", "Please enter a valid integer for the degree.");
-                            }
-                        });
-                    });
-                }
-            }
-        });
-
         loadingIndicator.visibleProperty().bind(mainViewModel.isProcessingProperty());
         canvas.widthProperty().bind(canvasPane.widthProperty());
         canvas.heightProperty().bind(canvasPane.heightProperty());

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.2"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="lewocz.graphics.view.components.toolbar.ToolBarComponent">
+
+    <fx:define>
+        <ToggleGroup fx:id="toolToggleGroup"/>
+    </fx:define>
+
+    <children>
+        <ToolBar fx:id="toolBar">
+            <items>
+                <ToggleButton fx:id="selectToolButton" text="Select" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="triangleToolButton" text="Triangle" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="quadrilateralToolButton" text="Quadrilateral" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="ellipseToolButton" text="Ellipse" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="lineToolButton" text="Line" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="freehandToolButton" text="Freehand" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="bezierToolButton" text="Bezier" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="polygonToolButton" text="Polygon" toggleGroup="$toolToggleGroup"/>
+                <Button fx:id="finishPolygonButton" text="Finish Polygon" onAction="#onFinishPolygon"/>
+                <ToggleButton fx:id="rotateToolButton" text="Rotate" toggleGroup="$toolToggleGroup"/>
+                <ToggleButton fx:id="scaleToolButton" text="Scale" toggleGroup="$toolToggleGroup"/>
+            </items>
+        </ToolBar>
+    </children>
+
+</AnchorPane>

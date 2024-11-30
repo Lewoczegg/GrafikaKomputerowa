@@ -13,10 +13,6 @@
             fx:controller="lewocz.graphics.view.MainView"
             prefWidth="600" prefHeight="400">
 
-    <fx:define>
-        <ToggleGroup fx:id="toolToggleGroup"/>
-    </fx:define>
-
     <left>
         <Pane fx:id="cubePane" prefWidth="300" prefHeight="200" style="-fx-background-color: lightgray;" />
     </left>
@@ -30,19 +26,7 @@
                     <MenuItem fx:id="loadShapesMenuItem" text="Load Shapes" onAction="#onLoadShapesMenuItemClicked"/>
                 </Menu>
             </MenuBar>
-            <ToolBar>
-                <ToggleButton fx:id="selectToolButton" text="Select" userData="SELECT" toggleGroup="$toolToggleGroup"/>
-                <ToggleButton fx:id="triangleToolButton" text="Triangle" userData="TRIANGLE" toggleGroup="$toolToggleGroup"/>
-                <ToggleButton fx:id="quadrilateralToolButton" text="Quadrilateral" userData="QUADRILATERAL" toggleGroup="$toolToggleGroup"/>
-                <ToggleButton fx:id="ellipseToolButton" text="Ellipse" userData="ELLIPSE" toggleGroup="$toolToggleGroup"/>
-                <ToggleButton fx:id="lineToolButton" text="Line" userData="LINE" toggleGroup="$toolToggleGroup"/>
-                <ToggleButton fx:id="freehandToolButton" text="Freehand" userData="FREEHAND" toggleGroup="$toolToggleGroup"/>
-                <ToggleButton fx:id="bezierToolButton" text="Bezier" userData="BEZIER" toggleGroup="$toolToggleGroup"/>
-                <ToggleButton fx:id="polygonToolButton" text="Polygon" userData="POLYGON" toggleGroup="$toolToggleGroup"/>
-                <Button fx:id="finishPolygonButton" text="Finish Polygon" onAction="#onFinishPolygon"/>
-                <ToggleButton fx:id="rotateToolButton" text="Rotate" userData="ROTATE" toggleGroup="$toolToggleGroup"/>
-                <ToggleButton fx:id="scaleToolButton" text="Scale" userData="SCALE" toggleGroup="$toolToggleGroup"/>
-            </ToolBar>
+            <fx:include source="components/toolbar/ToolBarComponent.fxml" fx:id="toolBarComponentInclude"/>
         </VBox>
     </top>
 
