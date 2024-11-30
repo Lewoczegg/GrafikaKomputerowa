@@ -5,11 +5,15 @@ import javafx.scene.paint.Color;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
-public abstract class ShapeModel {
-    private Color strokeColor = Color.BLACK;
-    private Color fillColor = Color.TRANSPARENT;
+public abstract class ShapeModel implements Serializable {
+    private static final long serialVersionUID = 3424372029161197990L;
+
+    private transient Color strokeColor = Color.BLACK;
+    private transient Color fillColor = Color.TRANSPARENT;
     private double strokeWidth = 1.0;
 
     public abstract void draw(GraphicsContext gc);

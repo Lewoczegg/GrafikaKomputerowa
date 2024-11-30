@@ -26,10 +26,7 @@ import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import lewocz.graphics.command.*;
 import lewocz.graphics.event.EventQueue;
-import lewocz.graphics.model.BezierCurveModel;
-import lewocz.graphics.model.PNMFormat;
-import lewocz.graphics.model.ShapeModel;
-import lewocz.graphics.model.Tool;
+import lewocz.graphics.model.*;
 import lewocz.graphics.view.components.DoubleTextField;
 import lewocz.graphics.view.components.IntegerTextField;
 import lewocz.graphics.viewmodel.IMainViewModel;
@@ -134,6 +131,11 @@ public class MainView {
     private MenuItem saveMenuItem;
     @FXML
     private MenuItem loadMenuItem;
+    @FXML
+    private MenuItem saveShapesMenuItem;
+    @FXML
+    private MenuItem loadShapesMenuItem;
+
 
     @FXML
     private IntegerTextField addRedField;
@@ -257,13 +259,13 @@ public class MainView {
     private Button applySauvolaThresholdingButton;
 
     @FXML
-    private TableView<Point2D> controlPointsTable;
+    private TableView<SerializablePoint> controlPointsTable;
     @FXML
-    private TableColumn<Point2D, Number> pointIndexColumn;
+    private TableColumn<SerializablePoint, Number> pointIndexColumn;
     @FXML
-    private TableColumn<Point2D, Double> pointXColumn;
+    private TableColumn<SerializablePoint, Double> pointXColumn;
     @FXML
-    private TableColumn<Point2D, Double> pointYColumn;
+    private TableColumn<SerializablePoint, Double> pointYColumn;
 
     @FXML
     private TextField rotationPivotXField;
@@ -282,7 +284,7 @@ public class MainView {
     @FXML
     private Button applyScaleButton;
 
-    private ObservableList<Point2D> controlPointsData = FXCollections.observableArrayList();
+    private ObservableList<SerializablePoint> controlPointsData = FXCollections.observableArrayList();
 
     private Group root3D;
     private double mousePosX, mousePosY;
@@ -331,25 +333,25 @@ public class MainView {
         pointYColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
 
         pointXColumn.setOnEditCommit(event -> {
-            Point2D point = event.getRowValue();
+            SerializablePoint point = event.getRowValue();
             int index = controlPointsData.indexOf(point);
             Double newValue = event.getNewValue();
-            Point2D newPoint = new Point2D(newValue, point.getY());
+            SerializablePoint newPoint = new SerializablePoint(newValue, point.getY());
             controlPointsData.set(index, newPoint);
             updateBezierControlPoint(index, newPoint);
         });
 
         pointYColumn.setOnEditCommit(event -> {
-            Point2D point = event.getRowValue();
+            SerializablePoint point = event.getRowValue();
             int index = controlPointsData.indexOf(point);
             Double newValue = event.getNewValue();
-            Point2D newPoint = new Point2D(point.getX(), newValue);
+            SerializablePoint newPoint = new SerializablePoint(point.getX(), newValue);
             controlPointsData.set(index, newPoint);
             updateBezierControlPoint(index, newPoint);
         });
     }
 
-    private void updateBezierControlPoint(int index, Point2D newPoint) {
+    private void updateBezierControlPoint(int index, SerializablePoint newPoint) {
         ShapeModel shape = mainViewModel.getCurrentShape();
         if (shape instanceof BezierCurveModel) {
             BezierCurveModel bezierCurve = (BezierCurveModel) shape;
@@ -465,6 +467,34 @@ public class MainView {
     @FXML
     private void onFinishPolygon() {
         mainViewModel.finishPolygon();
+    }
+
+    @FXML
+    private void onSaveShapesMenuItemClicked() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Shapes File");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Shapes Files", "*.shapes")
+        );
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            Command command = new SaveShapesCommand(mainViewModel, file.getAbsolutePath());
+            eventQueue.enqueue(command);
+        }
+    }
+
+    @FXML
+    private void onLoadShapesMenuItemClicked() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Shapes File");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Shapes Files", "*.shapes")
+        );
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            Command command = new LoadShapesCommand(mainViewModel, file.getAbsolutePath());
+            eventQueue.enqueue(command);
+        }
     }
 
     private void onApplyGrayscaleAverage() {

@@ -120,7 +120,7 @@ public class MainViewModel implements IMainViewModel {
         this.bezierDegree = degree;
     }
 
-    private List<Point2D> tempPolygonPoints = new ArrayList<>();
+    private List<SerializablePoint> tempPolygonPoints = new ArrayList<>();
 
 
     @Override
@@ -156,7 +156,7 @@ public class MainViewModel implements IMainViewModel {
                 }
                 break;
             case POLYGON:
-                tempPolygonPoints.add(new Point2D(x, y));
+                tempPolygonPoints.add(new SerializablePoint(x, y));
                 updateTempPolygonShape();
                 break;
             case ROTATE:
@@ -221,7 +221,7 @@ public class MainViewModel implements IMainViewModel {
                     // Update the last control point to the current mouse position
                     int lastIndex = bezierCurve.getControlPoints().size() - 1;
                     if (lastIndex >= 0) {
-                        bezierCurve.getControlPoints().set(lastIndex, new Point2D(x, y));
+                        bezierCurve.getControlPoints().set(lastIndex, new SerializablePoint(x, y));
                     }
                 }
                 break;
@@ -350,18 +350,26 @@ public class MainViewModel implements IMainViewModel {
         }
     }
 
-    public void saveShapesToFile(File file) throws IOException {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
+    @Override
+    public void saveShapesToFile(String filePath) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filePath))) {
             out.writeObject(new ArrayList<>(shapes));
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Optionally, show an alert to the user
         }
     }
 
-    public void loadShapesFromFile(File file) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+    @Override
+    public void loadShapesFromFile(String filePath) {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filePath))) {
             List<ShapeModel> loadedShapes = (List<ShapeModel>) in.readObject();
             shapes.clear();
             shapes.addAll(loadedShapes);
             requestRedraw();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            // Optionally, show an alert to the user
         }
     }
 

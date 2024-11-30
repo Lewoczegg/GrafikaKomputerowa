@@ -52,6 +52,8 @@ public interface IMainViewModel {
 
     void saveImage(String fileName, PNMFormat format, boolean binaryFormat, WritableImage image);
     void loadImage(String fileName, PNMFormat format);
+    void saveShapesToFile(String filePath);
+    void loadShapesFromFile(String filePath);
     void loadStandardImage(String fileName);
 
     void applyAddition(double addRed, double addGreen, double addBlue);

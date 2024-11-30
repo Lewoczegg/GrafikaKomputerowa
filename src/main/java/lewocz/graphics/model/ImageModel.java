@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ImageModel extends ShapeModel {
+    private static final long serialVersionUID = -3681584073044751562L;
 
     private WritableImage image;
     private double x;

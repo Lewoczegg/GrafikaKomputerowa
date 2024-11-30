@@ -8,6 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TriangleModel extends ShapeModel {
+    private static final long serialVersionUID = 985137658578246069L;
+
     private double[] xPoints = new double[3];
     private double[] yPoints = new double[3];
 

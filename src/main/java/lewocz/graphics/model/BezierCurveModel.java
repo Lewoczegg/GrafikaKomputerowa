@@ -1,6 +1,5 @@
 package lewocz.graphics.model;
 
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import lombok.Getter;
@@ -12,15 +11,17 @@ import java.util.List;
 @Getter
 @Setter
 public class BezierCurveModel extends ShapeModel {
-    private List<Point2D> controlPoints;
-    private Point2D selectedControlPoint;
+    private static final long serialVersionUID = -5702521876949423258L;
+
+    private List<SerializablePoint> controlPoints;
+    private SerializablePoint selectedControlPoint;
 
     public BezierCurveModel() {
         this.controlPoints = new ArrayList<>();
     }
 
     public void addControlPoint(double x, double y) {
-        controlPoints.add(new Point2D(x, y));
+        controlPoints.add(new SerializablePoint(x, y));
     }
 
     @Override
@@ -32,30 +33,30 @@ public class BezierCurveModel extends ShapeModel {
 
         // Draw the Bezier curve
         int steps = 100;
-        Point2D prevPoint = calculateBezierPoint(0.0);
+        SerializablePoint prevPoint = calculateBezierPoint(0.0);
         for (int i = 1; i <= steps; i++) {
             double t = i / (double) steps;
-            Point2D currentPoint = calculateBezierPoint(t);
+            SerializablePoint currentPoint = calculateBezierPoint(t);
             gc.strokeLine(prevPoint.getX(), prevPoint.getY(), currentPoint.getX(), currentPoint.getY());
             prevPoint = currentPoint;
         }
 
         // Optionally, draw control points
         gc.setFill(Color.RED);
-        for (Point2D cp : controlPoints) {
+        for (SerializablePoint cp : controlPoints) {
             gc.fillOval(cp.getX() - 3, cp.getY() - 3, 6, 6);
         }
     }
 
-    private Point2D calculateBezierPoint(double t) {
-        List<Point2D> tempPoints = new ArrayList<>(controlPoints);
+    private SerializablePoint  calculateBezierPoint(double t) {
+        List<SerializablePoint > tempPoints = new ArrayList<>(controlPoints);
         int n = tempPoints.size() - 1;
 
         while (n > 0) {
             for (int i = 0; i < n; i++) {
                 double x = (1 - t) * tempPoints.get(i).getX() + t * tempPoints.get(i + 1).getX();
                 double y = (1 - t) * tempPoints.get(i).getY() + t * tempPoints.get(i + 1).getY();
-                tempPoints.set(i, new Point2D(x, y));
+                tempPoints.set(i, new SerializablePoint (x, y));
             }
             n--;
         }
@@ -64,7 +65,7 @@ public class BezierCurveModel extends ShapeModel {
 
     @Override
     public boolean containsPoint(double x, double y) {
-        for (Point2D cp : controlPoints) {
+        for (SerializablePoint  cp : controlPoints) {
             if (cp.distance(x, y) <= 5) {
                 selectedControlPoint = cp;
                 return true;
@@ -78,14 +79,14 @@ public class BezierCurveModel extends ShapeModel {
         if (selectedControlPoint != null) {
             int index = controlPoints.indexOf(selectedControlPoint);
             if (index != -1) {
-                Point2D newPoint = selectedControlPoint.add(deltaX, deltaY);
+                SerializablePoint  newPoint = selectedControlPoint.add(deltaX, deltaY);
                 controlPoints.set(index, newPoint);
                 selectedControlPoint = newPoint;
             }
         } else {
             // Move entire curve if no control point is selected
             for (int i = 0; i < controlPoints.size(); i++) {
-                Point2D cp = controlPoints.get(i).add(deltaX, deltaY);
+                SerializablePoint  cp = controlPoints.get(i).add(deltaX, deltaY);
                 controlPoints.set(i, cp);
             }
         }
@@ -95,28 +96,28 @@ public class BezierCurveModel extends ShapeModel {
     public void rotate(double angle, double pivotX, double pivotY) {
         double radians = Math.toRadians(angle);
         for (int i = 0; i < controlPoints.size(); i++) {
-            Point2D point = controlPoints.get(i);
+            SerializablePoint point = controlPoints.get(i);
             double translatedX = point.getX() - pivotX;
             double translatedY = point.getY() - pivotY;
 
             double rotatedX = translatedX * Math.cos(radians) - translatedY * Math.sin(radians);
             double rotatedY = translatedX * Math.sin(radians) + translatedY * Math.cos(radians);
 
-            controlPoints.set(i, new Point2D(rotatedX + pivotX, rotatedY + pivotY));
+            controlPoints.set(i, new SerializablePoint(rotatedX + pivotX, rotatedY + pivotY));
         }
     }
 
     @Override
     public void scale(double factor, double pivotX, double pivotY) {
         for (int i = 0; i < controlPoints.size(); i++) {
-            Point2D point = controlPoints.get(i);
+            SerializablePoint point = controlPoints.get(i);
             double translatedX = point.getX() - pivotX;
             double translatedY = point.getY() - pivotY;
 
             double scaledX = translatedX * factor;
             double scaledY = translatedY * factor;
 
-            controlPoints.set(i, new Point2D(scaledX + pivotX, scaledY + pivotY));
+            controlPoints.set(i, new SerializablePoint(scaledX + pivotX, scaledY + pivotY));
         }
     }
 }

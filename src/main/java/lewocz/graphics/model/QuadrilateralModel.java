@@ -8,6 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class QuadrilateralModel extends ShapeModel {
+    private static final long serialVersionUID = -147555219615078147L;
+
     private double[] xPoints = new double[4];
     private double[] yPoints = new double[4];
 

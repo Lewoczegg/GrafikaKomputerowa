@@ -7,6 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EllipseModel extends ShapeModel {
+    private static final long serialVersionUID = -4470369422985822863L;
+
     private double centerX;
     private double centerY;
     private double radiusX;

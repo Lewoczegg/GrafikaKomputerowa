@@ -3,6 +3,8 @@ package lewocz.graphics.model;
 import javafx.scene.canvas.GraphicsContext;
 
 public class LineModel extends ShapeModel {
+    private static final long serialVersionUID = 8806187858083320281L;
+
     private double startX, startY, endX, endY;
 
     public LineModel(double startX, double startY, double endX, double endY) {

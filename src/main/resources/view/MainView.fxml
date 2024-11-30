@@ -26,6 +26,8 @@
                 <Menu text="File">
                     <MenuItem fx:id="saveMenuItem" text="Save" />
                     <MenuItem fx:id="loadMenuItem" text="Load" />
+                    <MenuItem fx:id="saveShapesMenuItem" text="Save Shapes" onAction="#onSaveShapesMenuItemClicked"/>
+                    <MenuItem fx:id="loadShapesMenuItem" text="Load Shapes" onAction="#onLoadShapesMenuItemClicked"/>
                 </Menu>
             </MenuBar>
             <ToolBar>

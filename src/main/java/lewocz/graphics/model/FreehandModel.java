@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FreehandModel extends ShapeModel {
+    private static final long serialVersionUID = 7836716480390598071L;
+
     private final List<Double> xPoints = new ArrayList<>();
     private final List<Double> yPoints = new ArrayList<>();
 
