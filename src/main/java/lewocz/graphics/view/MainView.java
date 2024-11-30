@@ -33,6 +33,8 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.Optional;
 
+import static lewocz.graphics.view.utils.AlertUtils.showAlert;
+
 @Component
 public class MainView {
     // Color Preview and Labels
@@ -1003,13 +1005,5 @@ public class MainView {
             Command command = new LoadCommand(mainViewModel, file.getAbsolutePath(), format);
             eventQueue.enqueue(command);
         }
-    }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

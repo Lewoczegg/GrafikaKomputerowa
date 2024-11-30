@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static lewocz.graphics.view.utils.AlertUtils.showAlert;
+
 @Component
 public class ToolBarComponent {
 
@@ -100,15 +102,5 @@ public class ToolBarComponent {
     @FXML
     private void onFinishPolygon() {
         mainViewModel.finishPolygon();
-    }
-
-    private void showAlert(String title, String message) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-        });
     }
 }
