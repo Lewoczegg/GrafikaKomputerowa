@@ -10,7 +10,7 @@
             prefWidth="600" prefHeight="400">
 
     <left>
-        <Pane fx:id="cubePane" prefWidth="300" prefHeight="200" style="-fx-background-color: lightgray;" />
+        <fx:include source="components/cube/CubeComponent.fxml" fx:id="cubeComponentInclude"/>
     </left>
     <top>
         <VBox>
@@ -18,8 +18,8 @@
                 <Menu text="File">
                     <MenuItem fx:id="saveMenuItem" text="Save" />
                     <MenuItem fx:id="loadMenuItem" text="Load" />
-                    <MenuItem fx:id="saveShapesMenuItem" text="Save Shapes" onAction="#onSaveShapesMenuItemClicked"/>
-                    <MenuItem fx:id="loadShapesMenuItem" text="Load Shapes" onAction="#onLoadShapesMenuItemClicked"/>
+                    <MenuItem fx:id="saveShapesMenuItem" text="Save Shapes"/>
+                    <MenuItem fx:id="loadShapesMenuItem" text="Load Shapes"/>
                 </Menu>
             </MenuBar>
             <fx:include source="components/toolbar/ToolBarComponent.fxml" fx:id="toolBarComponentInclude"/>
