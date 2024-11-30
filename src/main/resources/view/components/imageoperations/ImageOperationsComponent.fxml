@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import lewocz.graphics.view.components.IntegerTextField?>
+
+<?import javafx.geometry.Insets?>
+<ScrollPane xmlns="http://javafx.com/javafx/11.0.2"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="lewocz.graphics.view.components.imageoperations.ImageOperationsComponent"
+            fitToWidth="true">
+
+    <VBox spacing="10">
+        <padding>
+            <Insets top="10" right="10" bottom="10" left="10" />
+        </padding>
+        <!-- Addition -->
+        <TitledPane text="Addition" expanded="false">
+            <VBox spacing="5">
+                <HBox spacing="5">
+                    <Label text="Add R:" />
+                    <IntegerTextField fx:id="addRedField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="Add G:" />
+                    <IntegerTextField fx:id="addGreenField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="Add B:" />
+                    <IntegerTextField fx:id="addBlueField" prefWidth="50" />
+                </HBox>
+                <Button fx:id="applyAdditionButton" text="Apply Addition" />
+            </VBox>
+        </TitledPane>
+        <!-- Subtraction -->
+        <TitledPane text="Subtraction" expanded="false">
+            <VBox spacing="5">
+                <HBox spacing="5">
+                    <Label text="Subtract R:" />
+                    <IntegerTextField fx:id="subRedField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="Subtract G:" />
+                    <IntegerTextField fx:id="subGreenField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="Subtract B:" />
+                    <IntegerTextField fx:id="subBlueField" prefWidth="50" />
+                </HBox>
+                <Button fx:id="applySubtractionButton" text="Apply Subtraction" />
+            </VBox>
+        </TitledPane>
+        <!-- Multiplication -->
+        <TitledPane text="Multiplication" expanded="false">
+            <VBox spacing="5">
+                <HBox spacing="5">
+                    <Label text="Multiply R:" />
+                    <TextField fx:id="mulRedField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="Multiply G:" />
+                    <TextField fx:id="mulGreenField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="Multiply B:" />
+                    <TextField fx:id="mulBlueField" prefWidth="50" />
+                </HBox>
+                <Button fx:id="applyMultiplicationButton" text="Apply Multiplication" />
+            </VBox>
+        </TitledPane>
+        <!-- Division -->
+        <TitledPane text="Division" expanded="false">
+            <VBox spacing="5">
+                <HBox spacing="5">
+                    <Label text="Divide R:" />
+                    <TextField fx:id="divRedField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="Divide G:" />
+                    <TextField fx:id="divGreenField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="Divide B:" />
+                    <TextField fx:id="divBlueField" prefWidth="50" />
+                </HBox>
+                <Button fx:id="applyDivisionButton" text="Apply Division" />
+            </VBox>
+        </TitledPane>
+        <!-- Brightness Adjustment -->
+        <TitledPane text="Brightness Adjustment" expanded="false">
+            <VBox spacing="5">
+                <HBox spacing="5">
+                    <Label text="Brightness Change:" />
+                    <TextField fx:id="brightnessField" prefWidth="50" />
+                </HBox>
+                <Button fx:id="adjustBrightnessButton" text="Adjust Brightness" />
+            </VBox>
+        </TitledPane>
+        <!-- Grayscale -->
+        <TitledPane text="Grayscale" expanded="false">
+            <VBox spacing="5">
+                <Button fx:id="grayscaleAverageButton" text="Grayscale (Average)" />
+                <Button fx:id="grayscaleMaxButton" text="Grayscale (Max)" />
+            </VBox>
+        </TitledPane>
+        <!-- Filters -->
+        <TitledPane text="Filters" expanded="false">
+            <VBox spacing="5">
+                <Button fx:id="applySmoothingFilterButton" text="Smoothing Filter" />
+                <Button fx:id="applyMedianFilterButton" text="Median Filter" />
+                <Button fx:id="applySobelFilterButton" text="Sobel Filter" />
+                <Button fx:id="applyHighPassFilterButton" text="High-Pass Filter" />
+            </VBox>
+        </TitledPane>
+        <!-- Gaussian Blur -->
+        <TitledPane text="Gaussian Blur" expanded="false">
+            <VBox spacing="5">
+                <HBox spacing="5">
+                    <Label text="Kernel Size:" />
+                    <IntegerTextField fx:id="gaussianKernelSizeField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="Sigma:" />
+                    <TextField fx:id="gaussianSigmaField" prefWidth="50" />
+                </HBox>
+                <Button fx:id="applyGaussianBlurButton" text="Apply Gaussian Blur" />
+            </VBox>
+        </TitledPane>
+        <!-- Custom Convolution -->
+        <TitledPane text="Custom Convolution" expanded="false">
+            <VBox spacing="5">
+                <Button fx:id="applyCustomConvolutionButton" text="Apply Custom Convolution" />
+            </VBox>
+        </TitledPane>
+        <!-- Histogram Operations -->
+        <TitledPane text="Histogram Operations" expanded="false">
+            <VBox spacing="5">
+                <Button fx:id="applyHistogramStretchingButton" text="Histogram Stretching" />
+                <Button fx:id="applyHistogramEqualizationButton" text="Histogram Equalization" />
+            </VBox>
+        </TitledPane>
+        <!-- Binarization -->
+        <TitledPane text="Binarization" expanded="false">
+            <VBox spacing="5">
+                <VBox spacing="5">
+                    <HBox spacing="5">
+                        <Label text="Threshold (0-255):" />
+                        <TextField fx:id="manualThresholdField" prefWidth="50" />
+                    </HBox>
+                    <Button fx:id="applyManualThresholdingButton" text="Apply Manual Thresholding" />
+                </VBox>
+                <VBox spacing="5">
+                    <HBox spacing="5">
+                        <Label text="Percent Black (0-100):" />
+                        <TextField fx:id="percentBlackField" prefWidth="50" />
+                    </HBox>
+                    <Button fx:id="applyPercentBlackSelectionButton" text="Apply Percent Black Selection" />
+                </VBox>
+                <Button fx:id="applyMeanIterativeSelectionButton" text="Apply Mean Iterative Selection" />
+            </VBox>
+        </TitledPane>
+        <!-- Otsu Thresholding -->
+        <TitledPane text="Otsu Thresholding" expanded="false">
+            <VBox spacing="5">
+                <Button fx:id="applyOtsuThresholdingButton" text="Apply Otsu Thresholding" />
+            </VBox>
+        </TitledPane>
+        <!-- Niblack Thresholding -->
+        <TitledPane text="Niblack Thresholding" expanded="false">
+            <VBox spacing="5">
+                <HBox spacing="5">
+                    <Label text="Window Size (odd integer):" />
+                    <TextField fx:id="niblackWindowSizeField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="k value:" />
+                    <TextField fx:id="niblackKField" prefWidth="50" />
+                </HBox>
+                <Button fx:id="applyNiblackThresholdingButton" text="Apply Niblack Thresholding" />
+            </VBox>
+        </TitledPane>
+        <!-- Sauvola Thresholding -->
+        <TitledPane text="Sauvola Thresholding" expanded="false">
+            <VBox spacing="5">
+                <HBox spacing="5">
+                    <Label text="Window Size (odd integer):" />
+                    <TextField fx:id="sauvolaWindowSizeField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="k value:" />
+                    <TextField fx:id="sauvolaKField" prefWidth="50" />
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="r value:" />
+                    <TextField fx:id="sauvolaRField" prefWidth="50" />
+                </HBox>
+                <Button fx:id="applySauvolaThresholdingButton" text="Apply Sauvola Thresholding" />
+            </VBox>
+        </TitledPane>
+        <!-- Morphological Operations -->
+        <TitledPane text="Morphological Operations" expanded="false">
+            <VBox spacing="5">
+                <!-- Dilation and Erosion -->
+                <HBox spacing="5">
+                    <Button fx:id="applyDilationButton" text="Apply Dilation" />
+                    <Button fx:id="applyErosionButton" text="Apply Erosion" />
+                </HBox>
+                <!-- Opening and Closing -->
+                <HBox spacing="5">
+                    <Button fx:id="applyOpeningButton" text="Apply Opening" />
+                    <Button fx:id="applyClosingButton" text="Apply Closing" />
+                </HBox>
+                <!-- Hit-or-Miss Transform -->
+                <TitledPane text="Hit-or-Miss Transform" expanded="false">
+                    <VBox spacing="5">
+                        <Label text="Hit Mask (use 0 and 1):" />
+                        <TextArea fx:id="hitMaskArea" prefRowCount="3" prefColumnCount="10" />
+                        <Label text="Miss Mask (use 0 and 1):" />
+                        <TextArea fx:id="missMaskArea" prefRowCount="3" prefColumnCount="10" />
+                        <Button fx:id="applyHitOrMissButton" text="Apply Hit-or-Miss" />
+                    </VBox>
+                </TitledPane>
+            </VBox>
+        </TitledPane>
+    </VBox>
+</ScrollPane>

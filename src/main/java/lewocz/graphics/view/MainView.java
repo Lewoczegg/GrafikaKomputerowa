@@ -1,32 +1,20 @@
 package lewocz.graphics.view;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
-import javafx.util.converter.DoubleStringConverter;
-import javafx.util.converter.NumberStringConverter;
 import lewocz.graphics.command.*;
 import lewocz.graphics.event.EventQueue;
 import lewocz.graphics.model.*;
-import lewocz.graphics.view.components.DoubleTextField;
-import lewocz.graphics.view.components.IntegerTextField;
 import lewocz.graphics.viewmodel.IMainViewModel;
 import org.springframework.stereotype.Component;
 
@@ -37,67 +25,10 @@ import static lewocz.graphics.view.utils.AlertUtils.showAlert;
 
 @Component
 public class MainView {
-    // Color Preview and Labels
-    @FXML
-    private Rectangle colorPreview;
-    @FXML
-    private Label rgbValueLabel;
-    @FXML
-    private Label cmykValueLabel;
-    @FXML
-    private Label hsvValueLabel;
-
-    // RGB Controls
-    @FXML
-    private Slider redSlider;
-    @FXML
-    private IntegerTextField redTextField;
-    @FXML
-    private Slider greenSlider;
-    @FXML
-    private IntegerTextField greenTextField;
-    @FXML
-    private Slider blueSlider;
-    @FXML
-    private IntegerTextField blueTextField;
-
-    // CMYK Controls
-    @FXML
-    private Slider cyanSlider;
-    @FXML
-    private DoubleTextField cyanTextField;
-    @FXML
-    private Slider magentaSlider;
-    @FXML
-    private DoubleTextField magentaTextField;
-    @FXML
-    private Slider yellowSlider;
-    @FXML
-    private DoubleTextField yellowTextField;
-    @FXML
-    private Slider keySlider;
-    @FXML
-    private DoubleTextField keyTextField;
-
-    // HSV Controls
-    @FXML
-    private Slider hueSlider;
-    @FXML
-    private DoubleTextField hueTextField;
-    @FXML
-    private Slider saturationSlider;
-    @FXML
-    private DoubleTextField saturationTextField;
-    @FXML
-    private Slider valueSlider;
-    @FXML
-    private DoubleTextField valueTextField;
-
     @FXML
     private Pane canvasPane;
     @FXML
     private Canvas canvas;
-
     @FXML
     private Pane cubePane;
 
@@ -109,156 +40,8 @@ public class MainView {
     private MenuItem saveShapesMenuItem;
     @FXML
     private MenuItem loadShapesMenuItem;
-
-
-    @FXML
-    private IntegerTextField addRedField;
-    @FXML
-    private IntegerTextField addGreenField;
-    @FXML
-    private IntegerTextField addBlueField;
-    @FXML
-    private Button applyAdditionButton;
-
-    @FXML
-    private IntegerTextField subRedField;
-    @FXML
-    private IntegerTextField subGreenField;
-    @FXML
-    private IntegerTextField subBlueField;
-    @FXML
-    private Button applySubtractionButton;
-
-    // Multiplication Controls
-    @FXML
-    private TextField mulRedField;
-    @FXML
-    private TextField mulGreenField;
-    @FXML
-    private TextField mulBlueField;
-    @FXML
-    private Button applyMultiplicationButton;
-
-    // Division Controls
-    @FXML
-    private TextField divRedField;
-    @FXML
-    private TextField divGreenField;
-    @FXML
-    private TextField divBlueField;
-    @FXML
-    private Button applyDivisionButton;
-
-    @FXML
-    private TextField brightnessField;
-    @FXML
-    private Button adjustBrightnessButton;
-
-    @FXML
-    private Button grayscaleAverageButton;
-    @FXML
-    private Button grayscaleMaxButton;
-
-    @FXML
-    private Button applySmoothingFilterButton;
-    @FXML
-    private Button applyMedianFilterButton;
-    @FXML
-    private Button applySobelFilterButton;
-    @FXML
-    private Button applyHighPassFilterButton;
-    @FXML
-    private IntegerTextField gaussianKernelSizeField;
-    @FXML
-    private TextField gaussianSigmaField;
-    @FXML
-    private Button applyGaussianBlurButton;
-
-    @FXML
-    private Button applyCustomConvolutionButton;
-
     @FXML
     private ProgressIndicator loadingIndicator;
-
-    @FXML
-    private Button applyHistogramStretchingButton;
-    @FXML
-    private Button applyHistogramEqualizationButton;
-
-    @FXML
-    private TextField manualThresholdField;
-    @FXML
-    private Button applyManualThresholdingButton;
-
-    @FXML
-    private TextField percentBlackField;
-    @FXML
-    private Button applyPercentBlackSelectionButton;
-
-    @FXML
-    private Button applyMeanIterativeSelectionButton;
-
-    @FXML
-    private Button applyOtsuThresholdingButton;
-
-    @FXML
-    private TextField niblackWindowSizeField;
-    @FXML
-    private TextField niblackKField;
-    @FXML
-    private Button applyNiblackThresholdingButton;
-
-    @FXML
-    private Button applyDilationButton;
-    @FXML
-    private Button applyErosionButton;
-    @FXML
-    private Button applyOpeningButton;
-    @FXML
-    private Button applyClosingButton;
-    @FXML
-    private Button applyHitOrMissButton;
-    @FXML
-    private TextArea hitMaskArea;
-    @FXML
-    private TextArea missMaskArea;
-
-    @FXML
-    private TextField sauvolaWindowSizeField;
-    @FXML
-    private TextField sauvolaKField;
-    @FXML
-    private TextField sauvolaRField;
-    @FXML
-    private Button applySauvolaThresholdingButton;
-
-    @FXML
-    private TableView<SerializablePoint> controlPointsTable;
-    @FXML
-    private TableColumn<SerializablePoint, Number> pointIndexColumn;
-    @FXML
-    private TableColumn<SerializablePoint, Double> pointXColumn;
-    @FXML
-    private TableColumn<SerializablePoint, Double> pointYColumn;
-
-    @FXML
-    private TextField rotationPivotXField;
-    @FXML
-    private TextField rotationPivotYField;
-    @FXML
-    private TextField rotationAngleField;
-    @FXML
-    private Button applyRotationButton;
-    @FXML
-    private TextField scalingPivotXField;
-    @FXML
-    private TextField scalingPivotYField;
-    @FXML
-    private TextField scaleFactorField;
-    @FXML
-    private Button applyScaleButton;
-
-    private ObservableList<SerializablePoint> controlPointsData = FXCollections.observableArrayList();
 
     private Group root3D;
     private double mousePosX, mousePosY;
@@ -281,167 +64,9 @@ public class MainView {
         gc = canvas.getGraphicsContext2D();
         bindProperties();
         setupCanvasListeners();
-        bindColorProperties();
         setUp3DScene();
         mainViewModel.setRedrawCanvasCallback(this::redrawCanvas);
-        mainViewModel.currentShapeProperty().addListener((obs, oldShape, newShape) -> {
-            if (newShape instanceof BezierCurveModel) {
-                BezierCurveModel bezierCurve = (BezierCurveModel) newShape;
-                controlPointsData.setAll(bezierCurve.getControlPoints());
-            } else {
-                controlPointsData.clear();
-            }
-        });
-        bindControlPointsTable();
         redrawCanvas();
-    }
-
-    private void bindControlPointsTable() {
-        pointIndexColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(controlPointsData.indexOf(cellData.getValue())));
-        pointXColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getX()).asObject());
-        pointYColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getY()).asObject());
-
-        controlPointsTable.setItems(controlPointsData);
-
-        controlPointsTable.setEditable(true);
-        pointXColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
-        pointYColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
-
-        pointXColumn.setOnEditCommit(event -> {
-            SerializablePoint point = event.getRowValue();
-            int index = controlPointsData.indexOf(point);
-            Double newValue = event.getNewValue();
-            SerializablePoint newPoint = new SerializablePoint(newValue, point.getY());
-            controlPointsData.set(index, newPoint);
-            updateBezierControlPoint(index, newPoint);
-        });
-
-        pointYColumn.setOnEditCommit(event -> {
-            SerializablePoint point = event.getRowValue();
-            int index = controlPointsData.indexOf(point);
-            Double newValue = event.getNewValue();
-            SerializablePoint newPoint = new SerializablePoint(point.getX(), newValue);
-            controlPointsData.set(index, newPoint);
-            updateBezierControlPoint(index, newPoint);
-        });
-    }
-
-    private void updateBezierControlPoint(int index, SerializablePoint newPoint) {
-        ShapeModel shape = mainViewModel.getCurrentShape();
-        if (shape instanceof BezierCurveModel) {
-            BezierCurveModel bezierCurve = (BezierCurveModel) shape;
-            bezierCurve.getControlPoints().set(index, newPoint);
-            controlPointsData.set(index, newPoint); // Update the table data
-            redrawCanvas(); // Call the redraw method
-        }
-    }
-
-    private void onApplyAddition() {
-        try {
-            double addRed = Double.parseDouble(addRedField.getText());
-            double addGreen = Double.parseDouble(addGreenField.getText());
-            double addBlue = Double.parseDouble(addBlueField.getText());
-
-            Command command = new ApplyAdditionCommand(mainViewModel, addRed, addGreen, addBlue);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter valid numbers for addition values.");
-        }
-    }
-
-    private void onApplySubtraction() {
-        try {
-            double subRed = Double.parseDouble(subRedField.getText());
-            double subGreen = Double.parseDouble(subGreenField.getText());
-            double subBlue = Double.parseDouble(subBlueField.getText());
-            Command command = new ApplySubtractionCommand(mainViewModel, subRed, subGreen, subBlue);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter valid numbers for subtraction values.");
-        }
-    }
-
-    private void onApplyMultiplication() {
-        try {
-            double mulRed = Double.parseDouble(mulRedField.getText());
-            double mulGreen = Double.parseDouble(mulGreenField.getText());
-            double mulBlue = Double.parseDouble(mulBlueField.getText());
-            Command command = new ApplyMultiplicationCommand(mainViewModel, mulRed, mulGreen, mulBlue);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter valid numbers for multiplication values.");
-        }
-    }
-
-    private void onApplyDivision() {
-        try {
-            double divRed = Double.parseDouble(divRedField.getText());
-            double divGreen = Double.parseDouble(divGreenField.getText());
-            double divBlue = Double.parseDouble(divBlueField.getText());
-
-            if (divRed == 0 || divGreen == 0 || divBlue == 0) {
-                showAlert("Division by Zero", "Division values cannot be zero.");
-                return;
-            }
-
-            Command command = new ApplyDivisionCommand(mainViewModel, divRed, divGreen, divBlue);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter valid numbers for division values.");
-        }
-    }
-
-    private void onAdjustBrightness() {
-        try {
-            double brightnessChange = Double.parseDouble(brightnessField.getText().replace(',', '.'));
-            Command command = new AdjustBrightnessCommand(mainViewModel, brightnessChange);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter a valid number for brightness change.");
-        }
-    }
-
-    @FXML
-    private void onApplyRotation() {
-        try {
-            double pivotX = Double.parseDouble(rotationPivotXField.getText());
-            double pivotY = Double.parseDouble(rotationPivotYField.getText());
-            double angle = Double.parseDouble(rotationAngleField.getText());
-
-            if (mainViewModel.getCurrentShape() == null) {
-                showAlert("No Shape Selected", "Please select a shape to rotate.");
-                return;
-            }
-
-            Command command = new RotateCommand(mainViewModel, angle, pivotX, pivotY);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter valid numbers for pivot point and angle.");
-        }
-    }
-
-    @FXML
-    private void onApplyScaling() {
-        try {
-            double pivotX = Double.parseDouble(scalingPivotXField.getText());
-            double pivotY = Double.parseDouble(scalingPivotYField.getText());
-            double factor = Double.parseDouble(scaleFactorField.getText());
-
-            if (mainViewModel.getCurrentShape() == null) {
-                showAlert("No Shape Selected", "Please select a shape to scale.");
-                return;
-            }
-
-            Command command = new ScaleCommand(mainViewModel, factor, pivotX, pivotY);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter valid numbers for pivot point and scale factor.");
-        }
-    }
-
-    @FXML
-    private void onFinishPolygon() {
-        mainViewModel.finishPolygon();
     }
 
     @FXML
@@ -470,259 +95,6 @@ public class MainView {
             Command command = new LoadShapesCommand(mainViewModel, file.getAbsolutePath());
             eventQueue.enqueue(command);
         }
-    }
-
-    private void onApplyGrayscaleAverage() {
-        Command command = new ApplyGrayscaleAverageCommand(mainViewModel);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyGrayscaleMax() {
-        Command command = new ApplyGrayscaleMaxCommand(mainViewModel);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplySmoothingFilter() {
-        Command command = new ApplySmoothingFilterCommand(mainViewModel);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyMedianFilter() {
-        Command command = new ApplyMedianFilterCommand(mainViewModel);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplySobelFilter() {
-        Command command = new ApplySobelFilterCommand(mainViewModel);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyHighPassFilter() {
-        Command command = new ApplyHighPassFilterCommand(mainViewModel);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyGaussianBlur() {
-        try {
-            int kernelSize = Integer.parseInt(gaussianKernelSizeField.getText());
-            double sigma = Double.parseDouble(gaussianSigmaField.getText());
-
-            if (kernelSize % 2 == 0 || kernelSize <= 0) {
-                showAlert("Invalid Kernel Size", "Kernel size must be a positive odd integer.");
-                return;
-            }
-
-            if (sigma <= 0) {
-                showAlert("Invalid Sigma Value", "Sigma must be a positive number.");
-                return;
-            }
-
-            Command command = new ApplyGaussianBlurCommand(mainViewModel, kernelSize, sigma);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter valid numbers for kernel size and sigma.");
-        }
-    }
-
-    private void onApplyCustomConvolution() {
-        try {
-            TextInputDialog sizeDialog = new TextInputDialog("3");
-            sizeDialog.setTitle("Custom Convolution");
-            sizeDialog.setHeaderText("Enter Kernel Size");
-            sizeDialog.setContentText("Kernel Size (positive odd integer):");
-            Optional<String> sizeResult = sizeDialog.showAndWait();
-
-            if (sizeResult.isPresent()) {
-                int size = Integer.parseInt(sizeResult.get());
-
-                if (size % 2 == 0 || size <= 0) {
-                    showAlert("Invalid Kernel Size", "Kernel size must be a positive odd integer.");
-                    return;
-                }
-
-                double[][] kernel = new double[size][size];
-
-                for (int y = 0; y < size; y++) {
-                    for (int x = 0; x < size; x++) {
-                        TextInputDialog valueDialog = new TextInputDialog("0");
-                        valueDialog.setTitle("Custom Convolution");
-                        valueDialog.setHeaderText("Enter Kernel Value");
-                        valueDialog.setContentText("Value at (" + x + ", " + y + "):");
-                        Optional<String> valueResult = valueDialog.showAndWait();
-
-                        if (valueResult.isPresent()) {
-                            try {
-                                double value = Double.parseDouble(valueResult.get());
-                                kernel[y][x] = value;
-                            } catch (NumberFormatException e) {
-                                showAlert("Invalid Input", "Please enter a valid number for kernel value.");
-                                return;
-                            }
-                        } else {
-                            return; // User cancelled
-                        }
-                    }
-                }
-
-                Command command = new ApplyCustomConvolutionCommand(mainViewModel, kernel);
-                eventQueue.enqueue(command);
-            }
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter a valid number for kernel size.");
-        }
-    }
-
-    private void onApplyHistogramStretching() {
-        Command command = new ApplyHistogramStretchingCommand(mainViewModel);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyHistogramEqualization() {
-        Command command = new ApplyHistogramEqualizationCommand(mainViewModel);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyManualThresholding() {
-        try {
-            int threshold = Integer.parseInt(manualThresholdField.getText());
-            if (threshold < 0 || threshold > 255) {
-                showAlert("Invalid Threshold", "Threshold must be between 0 and 255.");
-                return;
-            }
-            Command command = new ApplyManualThresholdingCommand(mainViewModel, threshold);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter a valid integer for threshold.");
-        }
-    }
-
-    private void onApplyPercentBlackSelection() {
-        try {
-            double percentBlack = Double.parseDouble(percentBlackField.getText().replace(',', '.'));
-            if (percentBlack < 0 || percentBlack > 100) {
-                showAlert("Invalid Percentage", "Percentage must be between 0 and 100.");
-                return;
-            }
-            Command command = new ApplyPercentBlackSelectionCommand(mainViewModel, percentBlack);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter a valid number for percent black.");
-        }
-    }
-
-    private void onApplyMeanIterativeSelection() {
-        Command command = new ApplyMeanIterativeSelectionCommand(mainViewModel);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyOtsuThresholding() {
-        Command command = new ApplyOtsuThresholdingCommand(mainViewModel);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyNiblackThresholding() {
-        try {
-            int windowSize = Integer.parseInt(niblackWindowSizeField.getText());
-            double k = Double.parseDouble(niblackKField.getText().replace(',', '.'));
-
-            if (windowSize % 2 == 0 || windowSize <= 0) {
-                showAlert("Invalid Window Size", "Window size must be a positive odd integer.");
-                return;
-            }
-
-            Command command = new ApplyNiblackThresholdingCommand(mainViewModel, windowSize, k);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter valid numbers for window size and k.");
-        }
-    }
-
-    private void onApplySauvolaThresholding() {
-        try {
-            int windowSize = Integer.parseInt(sauvolaWindowSizeField.getText());
-            double k = Double.parseDouble(sauvolaKField.getText().replace(',', '.'));
-            double r = Double.parseDouble(sauvolaRField.getText().replace(',', '.'));
-
-            if (windowSize % 2 == 0 || windowSize <= 0) {
-                showAlert("Invalid Window Size", "Window size must be a positive odd integer.");
-                return;
-            }
-
-            Command command = new ApplySauvolaThresholdingCommand(mainViewModel, windowSize, k, r);
-            eventQueue.enqueue(command);
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter valid numbers for window size, k, and r.");
-        }
-    }
-
-    private void onApplyDilation() {
-        boolean[][] structuringElement = getDefaultStructuringElement();
-        Command command = new ApplyDilationCommand(mainViewModel, structuringElement);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyErosion() {
-        boolean[][] structuringElement = getDefaultStructuringElement();
-        Command command = new ApplyErosionCommand(mainViewModel, structuringElement);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyOpening() {
-        boolean[][] structuringElement = getDefaultStructuringElement();
-        Command command = new ApplyOpeningCommand(mainViewModel, structuringElement);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyClosing() {
-        boolean[][] structuringElement = getDefaultStructuringElement();
-        Command command = new ApplyClosingCommand(mainViewModel, structuringElement);
-        eventQueue.enqueue(command);
-    }
-
-    private void onApplyHitOrMiss() {
-        try {
-            boolean[][] hitMask = parseMask(hitMaskArea.getText());
-            boolean[][] missMask = parseMask(missMaskArea.getText());
-            Command command = new ApplyHitOrMissCommand(mainViewModel, hitMask, missMask);
-            eventQueue.enqueue(command);
-        } catch (IllegalArgumentException e) {
-            showAlert("Invalid Mask", e.getMessage());
-        }
-    }
-
-    private boolean[][] getDefaultStructuringElement() {
-        // Default 3x3 square structuring element
-        return new boolean[][] {
-                { true, true, true },
-                { true, true, true },
-                { true, true, true }
-        };
-    }
-
-    private boolean[][] parseMask(String maskText) throws IllegalArgumentException {
-        String[] lines = maskText.trim().split("\\n");
-        int numRows = lines.length;
-        int numCols = lines[0].trim().split("\\s+").length;
-
-        boolean[][] mask = new boolean[numRows][numCols];
-
-        for (int y = 0; y < numRows; y++) {
-            String[] tokens = lines[y].trim().split("\\s+");
-            if (tokens.length != numCols) {
-                throw new IllegalArgumentException("All rows must have the same number of elements.");
-            }
-            for (int x = 0; x < numCols; x++) {
-                String token = tokens[x];
-                if (token.equals("1")) {
-                    mask[y][x] = true;
-                } else if (token.equals("0")) {
-                    mask[y][x] = false;
-                } else {
-                    throw new IllegalArgumentException("Mask elements must be 0 or 1.");
-                }
-            }
-        }
-        return mask;
     }
 
     private void setUp3DScene() {
@@ -781,88 +153,6 @@ public class MainView {
 
         saveMenuItem.setOnAction(e -> onSaveMenuItemClicked());
         loadMenuItem.setOnAction(e -> onLoadMenuItemClicked());
-
-        applyAdditionButton.setOnAction(e -> onApplyAddition());
-        applySubtractionButton.setOnAction(e -> onApplySubtraction());
-        applyMultiplicationButton.setOnAction(e -> onApplyMultiplication());
-        applyDivisionButton.setOnAction(e -> onApplyDivision());
-
-        adjustBrightnessButton.setOnAction(e -> onAdjustBrightness());
-        grayscaleAverageButton.setOnAction(e -> onApplyGrayscaleAverage());
-        grayscaleMaxButton.setOnAction(e -> onApplyGrayscaleMax());
-
-        applySmoothingFilterButton.setOnAction(e -> onApplySmoothingFilter());
-        applyMedianFilterButton.setOnAction(e -> onApplyMedianFilter());
-        applySobelFilterButton.setOnAction(e -> onApplySobelFilter());
-        applyHighPassFilterButton.setOnAction(e -> onApplyHighPassFilter());
-        applyGaussianBlurButton.setOnAction(e -> onApplyGaussianBlur());
-        applyCustomConvolutionButton.setOnAction(e -> onApplyCustomConvolution());
-
-        applyHistogramStretchingButton.setOnAction(e -> onApplyHistogramStretching());
-        applyHistogramEqualizationButton.setOnAction(e -> onApplyHistogramEqualization());
-
-        applyManualThresholdingButton.setOnAction(e -> onApplyManualThresholding());
-        applyPercentBlackSelectionButton.setOnAction(e -> onApplyPercentBlackSelection());
-        applyMeanIterativeSelectionButton.setOnAction(e -> onApplyMeanIterativeSelection());
-
-        applyOtsuThresholdingButton.setOnAction(e -> onApplyOtsuThresholding());
-        applyNiblackThresholdingButton.setOnAction(e -> onApplyNiblackThresholding());
-        applySauvolaThresholdingButton.setOnAction(e -> onApplySauvolaThresholding());
-
-        applyDilationButton.setOnAction(e -> onApplyDilation());
-        applyErosionButton.setOnAction(e -> onApplyErosion());
-        applyOpeningButton.setOnAction(e -> onApplyOpening());
-        applyClosingButton.setOnAction(e -> onApplyClosing());
-        applyHitOrMissButton.setOnAction(e -> onApplyHitOrMiss());
-    }
-
-    private void bindColorProperties() {
-        setupIntegerField(redTextField, mainViewModel.redProperty(), redSlider);
-        setupIntegerField(greenTextField, mainViewModel.greenProperty(), greenSlider);
-        setupIntegerField(blueTextField, mainViewModel.blueProperty(), blueSlider);
-
-        setupDoubleField(cyanTextField, mainViewModel.cyanProperty(), cyanSlider);
-        setupDoubleField(magentaTextField, mainViewModel.magentaProperty(), magentaSlider);
-        setupDoubleField(yellowTextField, mainViewModel.yellowProperty(), yellowSlider);
-        setupDoubleField(keyTextField, mainViewModel.keyProperty(), keySlider);
-
-        setupDoubleField(hueTextField, mainViewModel.hueProperty(), hueSlider);
-        setupDoubleField(saturationTextField, mainViewModel.saturationProperty(), saturationSlider);
-        setupDoubleField(valueTextField, mainViewModel.valueProperty(), valueSlider);
-
-        // Update color preview and labels
-        mainViewModel.selectedColorProperty().addListener((obs, oldColor, newColor) -> {
-            colorPreview.setFill(newColor);
-
-            rgbValueLabel.setText(String.format("RGB: %d, %d, %d",
-                    mainViewModel.redProperty().get(),
-                    mainViewModel.greenProperty().get(),
-                    mainViewModel.blueProperty().get()));
-
-            cmykValueLabel.setText(String.format("CMYK: %.1f%%, %.1f%%, %.1f%%, %.1f%%",
-                    mainViewModel.cyanProperty().get(),
-                    mainViewModel.magentaProperty().get(),
-                    mainViewModel.yellowProperty().get(),
-                    mainViewModel.keyProperty().get()));
-
-            hsvValueLabel.setText(String.format("HSV: %.1f°, %.1f%%, %.1f%%",
-                    mainViewModel.hueProperty().get(),
-                    mainViewModel.saturationProperty().get(),
-                    mainViewModel.valueProperty().get()));
-        });
-
-        // Initialize the color preview
-        colorPreview.setFill(mainViewModel.selectedColorProperty().get());
-    }
-
-    private void setupIntegerField(TextField textField, IntegerProperty property, Slider slider) {
-        slider.valueProperty().bindBidirectional(property);
-        textField.textProperty().bindBidirectional(property, new NumberStringConverter());
-    }
-
-    private void setupDoubleField(TextField textField, DoubleProperty property, Slider slider) {
-        slider.valueProperty().bindBidirectional(property);
-        textField.textProperty().bindBidirectional(property, new NumberStringConverter());
     }
 
     private void setupCanvasListeners() {
@@ -881,17 +171,6 @@ public class MainView {
 
         canvas.widthProperty().addListener(evt -> redrawCanvas());
         canvas.heightProperty().addListener(evt -> redrawCanvas());
-    }
-
-    private void redrawCanvas() {
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        for (ShapeModel shape : mainViewModel.getShapes()) {
-            shape.draw(gc);
-        }
-
-        if (mainViewModel.getTempShape() != null) {
-            mainViewModel.getTempShape().draw(gc);
-        }
     }
 
     private void onSaveMenuItemClicked() {
@@ -1004,6 +283,17 @@ public class MainView {
 
             Command command = new LoadCommand(mainViewModel, file.getAbsolutePath(), format);
             eventQueue.enqueue(command);
+        }
+    }
+
+    private void redrawCanvas() {
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        for (ShapeModel shape : mainViewModel.getShapes()) {
+            shape.draw(gc);
+        }
+
+        if (mainViewModel.getTempShape() != null) {
+            mainViewModel.getTempShape().draw(gc);
         }
     }
 }

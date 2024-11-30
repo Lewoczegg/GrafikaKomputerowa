@@ -92,4 +92,5 @@ public interface IMainViewModel {
     void finishPolygon();
     void rotateShape(double angle, double pivotX, double pivotY);
     void scaleShape(double factor, double pivotX, double pivotY);
+    void requestRedraw();
 }

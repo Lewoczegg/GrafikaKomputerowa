@@ -918,7 +918,8 @@ public class MainViewModel implements IMainViewModel {
         redrawCanvasCallback.set(callback);
     }
 
-    private void requestRedraw() {
+    @Override
+    public void requestRedraw() {
         if (redrawCanvasCallback.get() != null) {
             Platform.runLater(redrawCanvasCallback.get());
         }

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Rectangle?>
+<?import lewocz.graphics.view.components.IntegerTextField?>
+<?import lewocz.graphics.view.components.DoubleTextField?>
+<VBox xmlns="http://javafx.com/javafx/11.0.2"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="lewocz.graphics.view.components.colorcontrols.ColorControlsComponent"
+      fx:id="colorControlsPane" spacing="10">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10" />
+    </padding>
+
+    <Rectangle fx:id="colorPreview" width="100" height="100" stroke="black" />
+
+    <VBox spacing="5">
+        <Label fx:id="rgbValueLabel" text="RGB: " />
+        <Label fx:id="cmykValueLabel" text="CMYK: " />
+        <Label fx:id="hsvValueLabel" text="HSV: " />
+    </VBox>
+
+    <TabPane fx:id="colorTabPane">
+        <tabs>
+            <Tab text="RGB">
+                <content>
+                    <VBox spacing="10">
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10" />
+                        </padding>
+                        <!-- Red -->
+                        <HBox spacing="5">
+                            <Label text="R:" />
+                            <Slider fx:id="redSlider" min="0" max="255" />
+                            <IntegerTextField fx:id="redTextField" prefWidth="50" />
+                        </HBox>
+                        <!-- Green -->
+                        <HBox spacing="5">
+                            <Label text="G:" />
+                            <Slider fx:id="greenSlider" min="0" max="255" />
+                            <IntegerTextField fx:id="greenTextField" prefWidth="50" />
+                        </HBox>
+                        <!-- Blue -->
+                        <HBox spacing="5">
+                            <Label text="B:" />
+                            <Slider fx:id="blueSlider" min="0" max="255" />
+                            <IntegerTextField fx:id="blueTextField" prefWidth="50" />
+                        </HBox>
+                    </VBox>
+                </content>
+            </Tab>
+            <!-- CMYK Tab -->
+            <Tab text="CMYK">
+                <content>
+                    <VBox spacing="10">
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10" />
+                        </padding>
+                        <!-- Cyan -->
+                        <HBox spacing="5">
+                            <Label text="C:" />
+                            <Slider fx:id="cyanSlider" min="0" max="100" />
+                            <DoubleTextField fx:id="cyanTextField" prefWidth="50" />
+                        </HBox>
+                        <!-- Magenta -->
+                        <HBox spacing="5">
+                            <Label text="M:" />
+                            <Slider fx:id="magentaSlider" min="0" max="100" />
+                            <DoubleTextField fx:id="magentaTextField" prefWidth="50" />
+                        </HBox>
+                        <!-- Yellow -->
+                        <HBox spacing="5">
+                            <Label text="Y:" />
+                            <Slider fx:id="yellowSlider" min="0" max="100" />
+                            <DoubleTextField fx:id="yellowTextField" prefWidth="50" />
+                        </HBox>
+                        <!-- Key (Black) -->
+                        <HBox spacing="5">
+                            <Label text="K:" />
+                            <Slider fx:id="keySlider" min="0" max="100" />
+                            <DoubleTextField fx:id="keyTextField" prefWidth="50" />
+                        </HBox>
+                    </VBox>
+                </content>
+            </Tab>
+            <!-- HSV Tab -->
+            <Tab text="HSV">
+                <content>
+                    <VBox spacing="10">
+                        <padding>
+                            <Insets top="10" right="10" bottom="10" left="10" />
+                        </padding>
+                        <!-- Hue -->
+                        <HBox spacing="5">
+                            <Label text="H:" />
+                            <Slider fx:id="hueSlider" min="0" max="360" />
+                            <DoubleTextField fx:id="hueTextField" prefWidth="50" />
+                        </HBox>
+                        <!-- Saturation -->
+                        <HBox spacing="5">
+                            <Label text="S:" />
+                            <Slider fx:id="saturationSlider" min="0" max="100" />
+                            <DoubleTextField fx:id="saturationTextField" prefWidth="50" />
+                        </HBox>
+                        <!-- Value -->
+                        <HBox spacing="5">
+                            <Label text="V:" />
+                            <Slider fx:id="valueSlider" min="0" max="100" />
+                            <DoubleTextField fx:id="valueTextField" prefWidth="50" />
+                        </HBox>
+                    </VBox>
+                </content>
+            </Tab>
+        </tabs>
+    </TabPane>
+</VBox>
